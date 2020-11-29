@@ -22,7 +22,7 @@ pandoc -s input.md --filter my-filter -o output.html
 
 ## Pandoc AST
 
-Much of the AST comes in the form of objects with a `t` and `c` property:
+Much of the JSON-serialized AST comes in the form of objects with a `t` and `c` property:
 
 ```json
 {
