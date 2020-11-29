@@ -43,7 +43,7 @@ The library defines types for both levels:
 ## Usage
 
 1. Create a console application.
-2. Install the `PandocFilters` NuGet package.
+2. Install the `PandocFilters` NuGet package (not yet available, https://github.com/zspitz/PandocFilters/issues/2)
 3. Write a class inheriting from `PandocFilters.FilterBase` or `PandocFilters.RawFilterBase`.
 4. In the `Main` method of your application:
    1. create a new instance of the class.
