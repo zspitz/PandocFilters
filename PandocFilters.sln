@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30717.126
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PandocFilters", "PandocFilters\PandocFilters.csproj", "{9E0C5C97-0D12-4CEB-9777-0CD4EFFD2A92}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "_test", "_test\_test.csproj", "{B91C735A-216B-436F-8BFE-351A77206F2A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9E0C5C97-0D12-4CEB-9777-0CD4EFFD2A92}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9E0C5C97-0D12-4CEB-9777-0CD4EFFD2A92}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9E0C5C97-0D12-4CEB-9777-0CD4EFFD2A92}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9E0C5C97-0D12-4CEB-9777-0CD4EFFD2A92}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B91C735A-216B-436F-8BFE-351A77206F2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B91C735A-216B-436F-8BFE-351A77206F2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B91C735A-216B-436F-8BFE-351A77206F2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B91C735A-216B-436F-8BFE-351A77206F2A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8BB4475F-5CFB-4255-B09C-D6B24D707D97}
+	EndGlobalSection
+EndGlobal

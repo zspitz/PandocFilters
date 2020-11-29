@@ -1,0 +1,9 @@
+{
+	"profiles": {
+		"_test": {
+			"commandName": "Executable",
+			"executablePath": "C:\\Program Files\\Pandoc\\pandoc.exe",
+			"commandLineArgs": "-s dlr-overview.docx --filter _test.exe -o dlr-overview.md"
+		}
+	}
+}
