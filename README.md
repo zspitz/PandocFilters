@@ -38,7 +38,7 @@ This corresponds to a `PandocFilters.Types.Para` object with it's properties fil
 The library defines types for both levels:
 
 * the "raw" types -- objects with `t` and `c` properties -- are in the `PandocFilters.Raw` namespace; and can be accessed by inherting from `PandocFilters.RawFilterBase`.
-* the higher-level AST types are in the `PandocFilters.Types` namespace; and can be accessed by inheriting from `PandocFilters.
+* the higher-level AST types are in the `PandocFilters.Types` namespace; and can be accessed by inheriting from `PandocFilters.FilterBase`.
 
 ## Usage
 
