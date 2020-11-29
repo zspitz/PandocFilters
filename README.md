@@ -28,7 +28,7 @@ Much of the AST comes in the form of objects with a `t` and `c` property:
 {
     "t": "Para",
     "c": [
-        // content
+
     ]
 }
 ```
