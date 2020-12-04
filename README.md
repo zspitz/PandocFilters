@@ -2,8 +2,6 @@
 
 Write Pandoc filters in .NET, using  strongly-typed data structures for the Pandoc AST.
 
-> This is very much still a work in progress; in particular, FilterBase cannot be used yet -- it's missing a converter.
-
 ## Pandoc filters
 
 [Pandoc](https://pandoc.org/) is a command-line program and Haskell library for converting documents from and to many different formats. Documents are translated from the input format to an AST (defined in the [Text.Pandoc.Definition](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) module), which is then used to create the output format.
