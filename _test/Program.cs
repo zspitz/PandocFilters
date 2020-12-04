@@ -8,7 +8,7 @@ Debugger.Launch();
 
 //var filter = new TestFilter();
 var filter = new RemoveImageStyling();
-filter.Loop();
+Filter.Run(filter);
 
 class TestFilter : RawFilterBase {
     protected override RawPandoc Parse(RawPandoc pandoc) => pandoc;
