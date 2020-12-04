@@ -44,8 +44,8 @@ The library defines types for both levels:
 2. Install the `PandocFilters` NuGet package (not yet available, https://github.com/zspitz/PandocFilters/issues/2)
 3. Write a class inheriting from `PandocFilters.FilterBase` or `PandocFilters.RawFilterBase`.
 4. In the `Main` method of your application:
-   1. create a new instance of the class.
-   2. Call the `Loop` method on the class.
+   1. create a new instance of the filter class.
+   2. Pass this instance into `Filter.Loop`.
 5. Either pass your program to Pandoc using `--filter`; or pipe the JSON output from Pandoc into your program, and pipe the outout back into Pandoc.
 
 ## Sample
@@ -57,7 +57,7 @@ using PandocFilters;
 using PandocFilters.Types;
 
 var filter = new RemoveImageStyling();
-filter.Loop();
+Filter.Run(filter);
 
 class RemoveImageStyling : FilterBase {
     protected override Pandoc Parse(Pandoc pandoc) {
