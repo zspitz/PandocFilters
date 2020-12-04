@@ -1,10 +1,12 @@
 ﻿using OneOf;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using ZSpitz.Util;
 
 namespace PandocFilters {
     internal static class Extensions {
-        private static readonly Type[] oneOfDefinitions = new[] {
+        private static readonly HashSet<Type> oneOfDefinitions = new HashSet<Type> {
             typeof(OneOf<>),
             typeof(OneOf<,>),
             typeof(OneOf<,,>),
@@ -13,40 +15,24 @@ namespace PandocFilters {
             typeof(OneOf<,,,,,>),
             typeof(OneOf<,,,,,,>),
             typeof(OneOf<,,,,,,,>),
-            typeof(OneOf<,,,,,,,,>)
-            // Currently, types inheriting from OneOfBase are unsupported
-            // until we find a way to leverage the implicit conversions on OneOfBase
-            //typeof(OneOfBase<>),
-            //typeof(OneOfBase<,>),
-            //typeof(OneOfBase<,,>),
-            //typeof(OneOfBase<,,,>),
-            //typeof(OneOfBase<,,,,>),
-            //typeof(OneOfBase<,,,,,>),
-            //typeof(OneOfBase<,,,,,,>),
-            //typeof(OneOfBase<,,,,,,,>),
-            //typeof(OneOfBase<,,,,,,,,>)
+            typeof(OneOf<,,,,,,,,>),
+            typeof(OneOfBase<>),
+            typeof(OneOfBase<,>),
+            typeof(OneOfBase<,,>),
+            typeof(OneOfBase<,,,>),
+            typeof(OneOfBase<,,,,>),
+            typeof(OneOfBase<,,,,,>),
+            typeof(OneOfBase<,,,,,,>),
+            typeof(OneOfBase<,,,,,,,>),
+            typeof(OneOfBase<,,,,,,,,>)
         };
 
-        internal static Type? OneOfType(this Type t) {
-            t = t.UnderlyingIfNullable();
-            t = t.UnderlyingIfNullable();
-            return
-                t.IsGenericType && t.GetGenericTypeDefinition().In(oneOfDefinitions) ?
-                    t :
-                    null;
-
-            /*var current = t;
-            while (current is { }) {
-                if (current.IsGenericType) {
-                    var def = current.GetGenericTypeDefinition();
-                    if (def.In(OneOfDefinitions)) {
-                        return current;
-                    }
-                }
-                current = current.BaseType;
-            }
-            return null;*/
-        }
+        internal static Type? OneOfType(this Type t) =>
+            t.BaseTypes(false, true)
+                .FirstOrDefault(x => {
+                    if (!x.IsGenericType) { return false; }
+                    return x.GetGenericTypeDefinition().In(oneOfDefinitions);
+                });
 
         internal static Type[] OneOfSubtypes(this Type t) {
             var type = t.OneOfType();
@@ -54,6 +40,5 @@ namespace PandocFilters {
                 Array.Empty<Type>() :
                 type.GetGenericArguments();
         }
-
     }
 }

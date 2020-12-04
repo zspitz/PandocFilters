@@ -30,9 +30,13 @@ namespace PandocFilters {
         }
     }
 
-    //public abstract class FilterBase : FilterBase<Pandoc> {
-    //    protected FilterBase() : base(new OneOfJsonConverter()) { }
-    //}
+    public abstract class FilterBase : FilterBase<Pandoc> {
+        protected FilterBase() : base(
+            new OneOfJsonConverter(),
+            new PandocTypesConverter(),
+            new TupleConverter()
+        ) { }
+    }
 
     public abstract class RawFilterBase : FilterBase<RawPandoc> {
         protected RawFilterBase() : base(new OneOfJsonConverter()) { }
