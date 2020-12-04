@@ -6,7 +6,7 @@ Write Pandoc filters in .NET, using  strongly-typed data structures for the Pand
 
 ## Pandoc filters
 
-[Pandoc](https://pandoc.org/) is a command-line program and Haskell library for converting documents from and to many different formats. Documents are translated from one format to an AST (defined in the Haskell [Text.Pandoc.Definition](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) module), which is then used to create the output format.
+[Pandoc](https://pandoc.org/) is a command-line program and Haskell library for converting documents from and to many different formats. Documents are translated from the input format to an AST (defined in the [Text.Pandoc.Definition](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) module), which is then used to create the output format.
 
 Pandoc allows writing [**filters**](https://pandoc.org/filters.html) -- programs that intercept the AST as JSON from standard input, modify the AST, and write it back out to standard output. Filters can be run using the pipe operator (`|` on Linux, `>` on Windows):
 
@@ -22,13 +22,13 @@ pandoc -s input.md --filter my-filter -o output.html
 
 ## Pandoc AST
 
-Much of the AST comes in the form of objects with a `t` and `c` property:
+Much of the JSON-serialized AST comes in the form of objects with a `t` and `c` property:
 
 ```json
 {
     "t": "Para",
     "c": [
-        // content
+
     ]
 }
 ```
@@ -38,12 +38,12 @@ This corresponds to a `PandocFilters.Types.Para` object with it's properties fil
 The library defines types for both levels:
 
 * the "raw" types -- objects with `t` and `c` properties -- are in the `PandocFilters.Raw` namespace; and can be accessed by inherting from `PandocFilters.RawFilterBase`.
-* the higher-level AST types are in the `PandocFilters.Types` namespace; and can be accessed by inheriting from `PandocFilters.
+* the higher-level AST types are in the `PandocFilters.Types` namespace; and can be accessed by inheriting from `PandocFilters.FilterBase`.
 
 ## Usage
 
 1. Create a console application.
-2. Install the `PandocFilters` NuGet package.
+2. Install the `PandocFilters` NuGet package (not yet available, https://github.com/zspitz/PandocFilters/issues/2)
 3. Write a class inheriting from `PandocFilters.FilterBase` or `PandocFilters.RawFilterBase`.
 4. In the `Main` method of your application:
    1. create a new instance of the class.
