@@ -27,9 +27,9 @@ matrix:
   fast_finish: true
 
 artifacts:
-  - path: Library\bin\Release\*.nupkg
+  - path: PandocFilters\bin\Release\*.nupkg
     type: NuGetPackage
-  - path: Library\bin\Release\*.snupkg
+  - path: PandocFilters\bin\Release\*.snupkg
     type: NuGetPackage
 
 deploy:
