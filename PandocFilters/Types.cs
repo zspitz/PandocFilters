@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OneOf;
@@ -7,76 +8,76 @@ namespace PandocFilters.Types {
 
     public record Pandoc(
         [property:JsonProperty("pandoc-api-version")] int[] ApiVersion, 
-        IDictionary<string, MetaValue> Meta, 
-        ICollection<Block> Blocks
+        ImmutableDictionary<string, MetaValue> Meta, 
+        ImmutableList<Block> Blocks
     );
 
-    // replace Meta with Dictionary<string, MetaValue>
+    // replace Meta with ImmutableDictionary<string, MetaValue>
 
     public class MetaValue : OneOfBase<
-        Dictionary<string, MetaValue>,
-        List<MetaValue>,
+        ImmutableDictionary<string, MetaValue>,
+        ImmutableList<MetaValue>,
         bool,
         string,
-        List<Inline>,
-        List<Block>
+        ImmutableList<Inline>,
+        ImmutableList<Block>
     > {
         public MetaValue(OneOf<
-            Dictionary<string, MetaValue>,
-            List<MetaValue>,
+            ImmutableDictionary<string, MetaValue>,
+            ImmutableList<MetaValue>,
             bool,
             string,
-            List<Inline>,
-            List<Block>
+            ImmutableList<Inline>,
+            ImmutableList<Block>
         > value) : base(value) { }
     }
 
     public abstract record Block;
 
-    public record Plain(List<Inline> Inlines) : Block;
-    public record Para(List<Inline> Inlines) : Block;
-    public record LineBlock(List<List<Inline>> NestedInlines) : Block;
+    public record Plain(ImmutableList<Inline> Inlines) : Block;
+    public record Para(ImmutableList<Inline> Inlines) : Block;
+    public record LineBlock(ImmutableList<ImmutableList<Inline>> NestedInlines) : Block;
     public record CodeBlock(Attr Attr, string Code) : Block;
     public record RawBlock(string Format, string Text) : Block;
-    public record BlockQuote(List<Block> Blocks) : Block;
-    public record OrderedList(ListAttributes ListAttributes, List<List<Block>> NestedBlocks) : Block;
-    public record BulletList(List<List<Block>> NestedBlocks) : Block;
-    public record DefinitionList(List<(List<Inline> term, List<List<Block>> definitions)> Items) : Block;
-    public record Header(int Level, Attr Attr, List<Inline> Text) : Block;
+    public record BlockQuote(ImmutableList<Block> Blocks) : Block;
+    public record OrderedList(ListAttributes ListAttributes, ImmutableList<ImmutableList<Block>> NestedBlocks) : Block;
+    public record BulletList(ImmutableList<ImmutableList<Block>> NestedBlocks) : Block;
+    public record DefinitionList(ImmutableList<(ImmutableList<Inline> term, ImmutableList<ImmutableList<Block>> definitions)> Items) : Block;
+    public record Header(int Level, Attr Attr, ImmutableList<Inline> Text) : Block;
     public record HorizontalRule : Block;
     public record Table(
         Attr Attr,
         Caption Caption,
-        List<(Alignment Alignment, OneOf<double, ColWidth> ColWidth)> ColSpecs,
+        ImmutableList<(Alignment Alignment, OneOf<double, ColWidth> ColWidth)> ColSpecs,
         TableHead TableHead,
-        List<TableBody> TableBodies,
+        ImmutableList<TableBody> TableBodies,
         TableFoot TableFoot
     ) : Block;
-    public record Div(Attr Attr, List<Block> Blocks);
+    public record Div(Attr Attr, ImmutableList<Block> Blocks);
     public record Null : Block;
 
     public abstract record Inline;
 
     public record Str(string Text) : Inline;
-    public record Emph(List<Inline> Inlines) : Inline;
-    public record Underline(List<Inline> Inlines) : Inline;
-    public record Strong(List<Inline> Inlines) : Inline;
-    public record Strikeout(List<Inline> Inlines) : Inline;
-    public record Superscript(List<Inline> Inlines) : Inline;
-    public record Subscript(List<Inline> Inlines) : Inline;
-    public record SmallCaps(List<Inline> Inlines) : Inline;
-    public record Quoted(QuoteType QuoteType, List<Inline> Inlines) : Inline;
-    public record Cite(List<Citation> Citations, List<Inline> Inlines) : Inline;
+    public record Emph(ImmutableList<Inline> Inlines) : Inline;
+    public record Underline(ImmutableList<Inline> Inlines) : Inline;
+    public record Strong(ImmutableList<Inline> Inlines) : Inline;
+    public record Strikeout(ImmutableList<Inline> Inlines) : Inline;
+    public record Superscript(ImmutableList<Inline> Inlines) : Inline;
+    public record Subscript(ImmutableList<Inline> Inlines) : Inline;
+    public record SmallCaps(ImmutableList<Inline> Inlines) : Inline;
+    public record Quoted(QuoteType QuoteType, ImmutableList<Inline> Inlines) : Inline;
+    public record Cite(ImmutableList<Citation> Citations, ImmutableList<Inline> Inlines) : Inline;
     public record Code(Attr Attr, string Text) : Inline;
     public record Space : Inline;
     public record SoftBreak : Inline;
     public record LineBreak : Inline;
     public record Math(MathType MathType, string Text) : Inline;
     public record RowInline(string Format, string Text) : Inline;
-    public record Link(Attr Attr, List<Inline> Inlines, (string Url, string Title) Target) : Inline;
-    public record Image(Attr Attr, List<Inline> Inlines, (string Url, string Title) Target) : Inline;
-    public record Note(List<Block> Blocks) : Inline;
-    public record Span(Attr Attr, List<Inline> Inlines) : Inline;
+    public record Link(Attr Attr, ImmutableList<Inline> Inlines, (string Url, string Title) Target) : Inline;
+    public record Image(Attr Attr, ImmutableList<Inline> Inlines, (string Url, string Title) Target) : Inline;
+    public record Note(ImmutableList<Block> Blocks) : Inline;
+    public record Span(Attr Attr, ImmutableList<Inline> Inlines) : Inline;
 
     public record ListAttributes(int StartNumber, ListNumberStyle ListNumberStyle, ListNumberDelim ListNumberDelim);
 
@@ -100,12 +101,12 @@ namespace PandocFilters.Types {
     // replace Format with string
 
     // <summary>Attributes: identifier, classes, key-value pairs</summary>
-    public record Attr(string Identifier, List<string> Classes, List<(string, string)> KeyValuePairs);
+    public record Attr(string Identifier, ImmutableList<string> Classes, ImmutableList<(string, string)> KeyValuePairs);
 
     /// <summary>The caption of a table, with an optional short caption.</summary>
-    public record Caption(List<Inline>? ShortCaption, List<Block> Blocks);
+    public record Caption(ImmutableList<Inline>? ShortCaption, ImmutableList<Block> Blocks);
 
-    // replace ShortCaption with List<Inline>
+    // replace ShortCaption with ImmutableList<Inline>
 
     // replace RowHeadColumns with int
 
@@ -122,16 +123,16 @@ namespace PandocFilters.Types {
 
     // replace ColSpec with (Alignment Alignment, OneOf<double, ColWidth> ColWidth)
 
-    public record Row(Attr Attr, List<Cell> Cells);
+    public record Row(Attr Attr, ImmutableList<Cell> Cells);
 
-    public record TableHead(Attr Attr, List<Row> Rows);
+    public record TableHead(Attr Attr, ImmutableList<Row> Rows);
 
-    public record TableBody(Attr Attr, int RowReadColumns, List<Row> Rows1, List<Row> Rows2);
+    public record TableBody(Attr Attr, int RowReadColumns, ImmutableList<Row> Rows1, ImmutableList<Row> Rows2);
 
-    public record TableFoot(Attr Attr, List<Row> Rows);
+    public record TableFoot(Attr Attr, ImmutableList<Row> Rows);
 
     /// <summary>A table cell</summary>
-    public record Cell(Attr Attr, Alignment Alignment, int RowSpan, int ColSpan, List<Block> Blocks);
+    public record Cell(Attr Attr, Alignment Alignment, int RowSpan, int ColSpan, ImmutableList<Block> Blocks);
 
     // replace ColSpan and RowSpan with named int
 
@@ -147,7 +148,7 @@ namespace PandocFilters.Types {
         InlineMath
     }
 
-    public record Citation(string CitationId, List<Inline> CitationPrefix, List<Inline> CitationSuffix, CitationMode CitationMode, int CitationNoteNum, int CitationHash);
+    public record Citation(string CitationId, ImmutableList<Inline> CitationPrefix, ImmutableList<Inline> CitationSuffix, CitationMode CitationMode, int CitationNoteNum, int CitationHash);
 
     public enum CitationMode {
         AuthorInText,

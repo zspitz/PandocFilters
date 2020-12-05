@@ -89,10 +89,7 @@ namespace PandocFilters {
             var objects = types.Zip(token)
                 .SelectT((type, token) => token.ToObject(type, serializer))
                 .ToArray();
-            return
-                isValueTuple ?
-                    MakeTuple(objects, types) :
-                    MakeOldTuple(objects, types);
+            return MakeTuple(isValueTuple, objects, types);
         }
 
         public override bool CanConvert(Type objectType) => objectType.UnderlyingIfNullable().IsTupleType();

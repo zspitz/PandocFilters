@@ -4,12 +4,32 @@
     <TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
+
+    <PackageId>PandocFilters</PackageId>
+    <Authors>Zev Spitz</Authors>
+    <Company />
+    <Product>PandocFilters</Product>
+    <Description>Write Pandoc filters in .NET, using strongly-typed data structures for the Pandoc AST</Description>
+    <Copyright>Copyright (c) 2020 Zev Spitz</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/zspitz/PandocFilters</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/zspitz/PandocFilters</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>pandoc pandoc-filters pandoc-ast</PackageTags>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="OneOf" Version="3.0.162" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="ZSpitz.Util" Version="0.1.75" />
+    <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
+    <PackageReference Include="ZSpitz.Util" Version="0.1.78" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>
