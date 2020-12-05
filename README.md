@@ -2,8 +2,6 @@
 
 Write Pandoc filters in .NET, using  strongly-typed data structures for the Pandoc AST.
 
-> This is very much still a work in progress; in particular, FilterBase cannot be used yet -- it's missing a converter.
-
 ## Pandoc filters
 
 [Pandoc](https://pandoc.org/) is a command-line program and Haskell library for converting documents from and to many different formats. Documents are translated from the input format to an AST (defined in the [Text.Pandoc.Definition](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) module), which is then used to create the output format.
@@ -46,8 +44,8 @@ The library defines types for both levels:
 2. Install the `PandocFilters` NuGet package (not yet available, https://github.com/zspitz/PandocFilters/issues/2)
 3. Write a class inheriting from `PandocFilters.FilterBase` or `PandocFilters.RawFilterBase`.
 4. In the `Main` method of your application:
-   1. create a new instance of the class.
-   2. Call the `Loop` method on the class.
+   1. create a new instance of the filter class.
+   2. Pass this instance into `Filter.Loop`.
 5. Either pass your program to Pandoc using `--filter`; or pipe the JSON output from Pandoc into your program, and pipe the outout back into Pandoc.
 
 ## Sample
@@ -59,7 +57,7 @@ using PandocFilters;
 using PandocFilters.Types;
 
 var filter = new RemoveImageStyling();
-filter.Loop();
+Filter.Run(filter);
 
 class RemoveImageStyling : FilterBase {
     protected override Pandoc Parse(Pandoc pandoc) {
