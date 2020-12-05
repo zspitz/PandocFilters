@@ -29,16 +29,9 @@ namespace PandocFilters {
 
         internal static Type? OneOfType(this Type t) =>
             t.BaseTypes(false, true)
-                .FirstOrDefault(x => {
-                    if (!x.IsGenericType) { return false; }
-                    return x.GetGenericTypeDefinition().In(oneOfDefinitions);
-                });
+                .FirstOrDefault(x => x.IsGenericType && x.GetGenericTypeDefinition().In(oneOfDefinitions));
 
-        internal static Type[] OneOfSubtypes(this Type t) {
-            var type = t.OneOfType();
-            return type is null ?
-                Array.Empty<Type>() :
-                type.GetGenericArguments();
-        }
+        internal static Type[] OneOfSubtypes(this Type t) => 
+            t.OneOfType()?.GetGenericArguments() ?? Array.Empty<Type>();
     }
 }

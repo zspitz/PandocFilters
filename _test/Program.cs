@@ -10,9 +10,9 @@ Debugger.Launch();
 var filter = new RemoveImageStyling();
 Filter.Run(filter);
 
-class TestFilter : RawFilterBase {
-    protected override RawPandoc Parse(RawPandoc pandoc) => pandoc;
-}
+//class TestFilter : RawFilterBase {
+//    protected override RawPandoc Parse(RawPandoc pandoc) => pandoc;
+//}
 
 class RemoveImageStyling : FilterBase {
     protected override Pandoc Parse(Pandoc pandoc) {

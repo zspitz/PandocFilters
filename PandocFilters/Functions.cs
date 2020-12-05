@@ -8,16 +8,6 @@ using ZSpitz.Util;
 
 namespace PandocFilters {
     internal static class Functions {
-        // TODO handle more than 8 values
-        internal static object?[] TupleValues(object? tuple) {
-            if (tuple is null) { throw new InvalidOperationException("No tuple values in null."); }
-            var type = tuple.GetType();
-            if (!type.IsTupleType()) { throw new InvalidOperationException($"Type '{type}' is not a tuple type."); }
-            var fields = type.GetFields();
-            if (fields.Any()) { return type.GetFields().Select(x => x.GetValue(tuple)).ToArray(); }
-            return type.GetProperties().Select(x => x.GetValue(tuple)).ToArray();
-        }
-
         internal static bool IsTypeMatch(JToken token, Type type, [NotNullWhen(true)] out Type? matchedType) {
             var oneofTypes = type.OneOfSubtypes();
             if (oneofTypes.Length > 0) {

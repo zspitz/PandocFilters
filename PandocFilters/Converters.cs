@@ -4,11 +4,11 @@ using OneOf;
 using PandocFilters.Types;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Dynamic;
 using System.Linq;
 using System.Reflection;
 using ZSpitz.Util;
+using static ZSpitz.Util.Functions;
 
 namespace PandocFilters {
     public class OneOfJsonConverter : JsonConverter {
@@ -20,8 +20,10 @@ namespace PandocFilters {
         }
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
-            var underlying = objectType.UnderlyingIfNullable();
             var token = JToken.ReadFrom(reader);
+            if (token.Type == JTokenType.Null) { return null; }
+
+            var underlying = objectType.UnderlyingIfNullable();
             if (!Functions.IsTypeMatch(token, underlying, out var matchedType)) {
                 throw new InvalidOperationException($"Cannot map token to any subtype of '{objectType}'.");
             }
@@ -66,10 +68,13 @@ namespace PandocFilters {
 
     public class TupleConverter : JsonConverter {
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) =>
-            serializer.Serialize(writer, Functions.TupleValues(value));
+            serializer.Serialize(writer, TupleValues(value!));
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
             var token = JToken.ReadFrom(reader);
+            if (token.Type == JTokenType.Null) { return null; }
+
+            var underlying = objectType.UnderlyingIfNullable();
             if (!Functions.IsTypeMatch(token, objectType, out _)) {
                 if (token.Type == JTokenType.Array) {
                     // return default conversion here
@@ -79,40 +84,23 @@ namespace PandocFilters {
                 throw new InvalidOperationException($"Cannot map token to tuple type '{objectType}'.");
             }
 
-            var isValueTuple = objectType.Name.StartsWith("ValueTuple");
-            var types = objectType.GetGenericArguments();
+            var isValueTuple = underlying.Name.StartsWith("ValueTuple");
+            var types = underlying.GetGenericArguments();
             var objects = types.Zip(token)
                 .SelectT((type, token) => token.ToObject(type, serializer))
                 .ToArray();
-            return makeTuple(isValueTuple, objects, types);
+            return
+                isValueTuple ?
+                    MakeTuple(objects, types) :
+                    MakeOldTuple(objects, types);
         }
 
-        public override bool CanConvert(Type objectType) => objectType.IsTupleType();
-
-        private static object makeTuple(bool valueTuple, object?[] elements, Type[]? types = null) {
-            types ??= elements.Select(x => {
-                if (x is null) { return typeof(object); }
-                return x.GetType();
-            }).ToArray();
-
-            var tupleFactoryType =
-                valueTuple ?
-                    typeof(ValueTuple) :
-                    typeof(Tuple);
-
-            return tupleFactoryType
-                .GetMethods()
-                .First(x => x.Name == "Create" && x.GetGenericArguments().Length == types.Length)
-                .MakeGenericMethod(types)
-                .Invoke(null, elements)!;
-        }
-
-        public static object MakeTuple(params object[] elements) => makeTuple(true, elements);
-        public static object MakeOldTuple(params object[] elements) => makeTuple(false, elements);
+        public override bool CanConvert(Type objectType) => objectType.UnderlyingIfNullable().IsTupleType();
     }
 
     public class PandocTypesConverter : JsonConverter {
-        private static Dictionary<string, ConstructorInfo?> handledTypes =
+        // nameof only returns the last segment of the fully-qualified name - https://stackoverflow.com/a/38584443/111794
+        private static readonly Dictionary<string, ConstructorInfo?> handledTypes =
             typeof(Pandoc).Assembly.GetTypes()
                 .Where(x => x.Namespace == $"{nameof(PandocFilters)}.{nameof(Types)}" &&!(
                     x == typeof(Pandoc) ||
@@ -122,7 +110,7 @@ namespace PandocFilters {
                     x.Name, 
                     x.IsEnum ? null : x.GetConstructors().SingleOrDefault()
                 ))
-                .ToDictionary()!; // SingleOrDefault should return ConstructorInfo? but returns ConstructorInfo
+                .ToDictionary()!; // SingleOrDefault should be typed as ConstructorInfo? but returns ConstructorInfo
 
         private static readonly HashSet<string> tupleRecordNames = new() { "Attr", "Caption", "TableHead", "Row","Cell", "TableBody", "TableFoot"};
 
@@ -185,8 +173,7 @@ namespace PandocFilters {
                     };
                     return ctor.Invoke(args);
                 case JTokenType.Array:
-                    // Haskell tuples are represented as arrays, and Haskell types support aliases.
-                    // .NET doesn't have type aliases (only "using" aliases, within a given file) so we're using record types for aliased tuples
+                    // some Haskell types are represented as arrays instead of objects with the t and c properties
                     ctor = objectType.GetConstructors().Single();
                     if (ctor is null) { throw new InvalidOperationException(); }
                     parameters = ctor.GetParameters();
@@ -202,7 +189,6 @@ namespace PandocFilters {
             throw new NotImplementedException();
         }
 
-        // nameof only returns the last segment of the fully-qualified name - https://stackoverflow.com/a/38584443/111794
         public override bool CanConvert(Type objectType) => handledTypes.ContainsKey(objectType.Name);
     }
 }
