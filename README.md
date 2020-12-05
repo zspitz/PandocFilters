@@ -1,5 +1,7 @@
 # PandocFilters
 
+[![AppVeyor build status](https://img.shields.io/appveyor/ci/zspitz/pandocfilters?style=flat&max-age=86400)](https://ci.appveyor.com/project/zspitz/pandocfilters) [![NuGet Status](https://img.shields.io/nuget/v/pandocfilters.svg?style=flat&max-age=86400)](https://www.nuget.org/packages/pandocfilters/)
+
 Write Pandoc filters in .NET, using  strongly-typed data structures for the Pandoc AST.
 
 ## Pandoc filters
