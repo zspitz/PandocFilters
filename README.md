@@ -77,3 +77,7 @@ class RemoveImageStyling : FilterBase {
 
 * John McFarlane and contributors for Pandoc
 * [dbramucci](https://www.reddit.com/user/dbramucci) and [Lalaithion42](https://www.reddit.com/user/Lalaithion42) for their [help in understanding Haskell data types](https://www.reddit.com/r/haskell/comments/jx9lf7/basic_guide_to_reading_haskell_type_definition/)
+
+## Notes
+
+* PandocFilters is written against the types in [**pandoc-types 1.22**](https://hackage.haskell.org/package/pandoc-types-1.22). When pandoc-types is updated, code written against the raw types will successfully receive the JSON-source data structures; while code written against the higher-level types will conceivably fail in the JSON parsing stage.
