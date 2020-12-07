@@ -33,7 +33,7 @@ Much of the JSON-serialized AST comes in the form of objects with a `t` and `c` 
 }
 ```
 
-This corresponds to a `PandocFilters.Types.Para` object with it's properties filled with the values at the `c` property.
+This corresponds to a `PandocFilters.Types.Para` object with properties filled with the values at the `c` property.
 
 The library defines types for both levels:
 
@@ -43,7 +43,7 @@ The library defines types for both levels:
 ## Usage
 
 1. Create a console application.
-2. Install the `PandocFilters` NuGet package (not yet available, https://github.com/zspitz/PandocFilters/issues/2)
+2. Install the `PandocFilters` NuGet package.
 3. Write a class inheriting from `PandocFilters.FilterBase` or `PandocFilters.RawFilterBase`.
 4. In the `Main` method of your application:
    1. create a new instance of the filter class.
@@ -69,8 +69,15 @@ class RemoveImageStyling : FilterBase {
         return pandoc;
     }
 }
+// Note that this will only remove styling from top-level images; it doesn't recurse.
+// Pending https://github.com/zspitz/PandocFilters/issues/8
 ```
 
-## Debugging
+## Credits
 
-There is an issue with debugging; see https://github.com/zspitz/PandocFilters/issues/4.
+* John McFarlane and contributors for Pandoc
+* [dbramucci](https://www.reddit.com/user/dbramucci) and [Lalaithion42](https://www.reddit.com/user/Lalaithion42) for their [help in understanding Haskell data types](https://www.reddit.com/r/haskell/comments/jx9lf7/basic_guide_to_reading_haskell_type_definition/)
+
+## Notes
+
+* PandocFilters is written against the types in [**pandoc-types 1.22**](https://hackage.haskell.org/package/pandoc-types-1.22). When pandoc-types is updated, code written against the raw types will successfully receive the JSON-source data structures; while code written against the higher-level types will conceivably fail in the JSON parsing stage.
