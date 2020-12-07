@@ -28,23 +28,25 @@ Much of the JSON-serialized AST comes in the form of objects with a `t` and `c` 
 {
     "t": "Para",
     "c": [
-
+        /* more here */
     ]
 }
 ```
 
 This corresponds to a `PandocFilters.Types.Para` object with properties filled with the values at the `c` property.
 
-The library defines types for both levels:
+The library defines types and base classes for both levels:
 
-* the "raw" types -- objects with `t` and `c` properties -- are in the `PandocFilters.Raw` namespace; and can be accessed by inherting from `PandocFilters.RawFilterBase`.
-* the higher-level AST types are in the `PandocFilters.Types` namespace; and can be accessed by inheriting from `PandocFilters.FilterBase`.
+| Type level | Description | Types namespace | Filter base class<br/>(non-recursive) | Visitor base class<br/>(recurisve) |
+| -- | -- | -- | -- | -- |
+| Raw | Objects with a `t` and `c` property|  `PandocFilters.RawTypes` | `RawFilterBase` | `RawVisitorBase` |
+| Higher-level AST | e.g. `Para` type |`PandocFilters.Types` | `FilterBase` | `VisitorBase` |
 
 ## Usage
 
 1. Create a console application.
 2. Install the `PandocFilters` NuGet package.
-3. Write a class inheriting from `PandocFilters.FilterBase` or `PandocFilters.RawFilterBase`.
+3. Write a class inheriting from one of the base classes in the above table.
 4. In the `Main` method of your application:
    1. create a new instance of the filter class.
    2. Pass this instance into `Filter.Loop`.
@@ -58,19 +60,17 @@ using System.Linq;
 using PandocFilters;
 using PandocFilters.Types;
 
-var filter = new RemoveImageStyling();
-Filter.Run(filter);
+var visitor = new RemoveImageStyling();
+Filter.Run(visitor);
 
-class RemoveImageStyling : FilterBase {
-    protected override Pandoc Parse(Pandoc pandoc) {
-        foreach (var img in pandoc.Blocks.OfType<Image>()) {
-            img.Attr.KeyValuePairs.Clear();
-        }
-        return pandoc;
-    }
+class RemoveImageStyling : VisitorBase {
+    public override Image VisitImage(Image image) =>
+        image with {
+            Attr = image.Attr with {
+                KeyValuePairs = ImmutableList.Create<(string, string)>()
+            }
+        };
 }
-// Note that this will only remove styling from top-level images; it doesn't recurse.
-// Pending https://github.com/zspitz/PandocFilters/issues/8
 ```
 
 ## Credits
