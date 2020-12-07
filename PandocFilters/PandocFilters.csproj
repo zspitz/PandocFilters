@@ -17,6 +17,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>pandoc pandoc-filters pandoc-ast</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
@@ -29,7 +30,7 @@
     <PackageReference Include="OneOf" Version="3.0.162" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
-    <PackageReference Include="ZSpitz.Util" Version="0.1.78" />
+    <PackageReference Include="ZSpitz.Util" Version="0.1.81" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>

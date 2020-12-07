@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OneOf;
@@ -53,7 +52,7 @@ namespace PandocFilters.Types {
         ImmutableList<TableBody> TableBodies,
         TableFoot TableFoot
     ) : Block;
-    public record Div(Attr Attr, ImmutableList<Block> Blocks);
+    public record Div(Attr Attr, ImmutableList<Block> Blocks) : Block;
     public record Null : Block;
 
     public abstract record Inline;

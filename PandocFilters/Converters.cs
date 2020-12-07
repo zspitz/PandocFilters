@@ -21,7 +21,6 @@ namespace PandocFilters {
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
             var token = JToken.ReadFrom(reader);
-            if (token.Type == JTokenType.Null) { return null; }
 
             var underlying = objectType.UnderlyingIfNullable();
             if (!Functions.IsTypeMatch(token, underlying, out var matchedType)) {
