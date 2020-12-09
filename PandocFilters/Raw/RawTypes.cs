@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using OneOf;
 using Newtonsoft.Json;
-using DataValue = OneOf.OneOf<PandocFilters.RawTypes.TagContent, string, long, PandocFilters.RawTypes.TagContent1>;
+using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent, string, long, PandocFilters.Raw.TagContent1>;
 using System.Collections.Immutable;
 
-namespace PandocFilters.RawTypes {
+namespace PandocFilters.Raw {
     public record TagContent(string T, OneOf<
         DataValue[],
         DataValue

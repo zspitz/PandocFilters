@@ -33,20 +33,20 @@ Much of the JSON-serialized AST comes in the form of objects with a `t` and `c` 
 }
 ```
 
-This corresponds to a `PandocFilters.Types.Para` object with properties filled with the values at the `c` property.
+This corresponds to a `Para` object with properties filled with the values at the `c` property.
 
 The library defines types and base classes for both levels:
 
-| Type level | Description | Types namespace | Filter base class<br/>(non-recursive) | Visitor base class<br/>(recurisve) |
-| -- | -- | -- | -- | -- |
-| Raw | Objects with a `t` and `c` property|  `PandocFilters.RawTypes` | `RawFilterBase` | `RawVisitorBase` |
-| Higher-level AST | e.g. `Para` type |`PandocFilters.Types` | `FilterBase` | `VisitorBase` |
+| Type level | Description | Namespace | Visitor base class |
+| -- | -- | -- | -- |
+| Raw | Objects with a `t` and `c` property|  `PandocFilters.Raw` | `RawVisitorBase` |
+| Higher-level AST | e.g. `Para` type |`PandocFilters.Ast` | `VisitorBase` |
 
 ## Usage
 
 1. Create a console application.
 2. Install the `PandocFilters` NuGet package.
-3. Write a class inheriting from one of the base classes in the above table.
+3. Write a class inheriting from one of the visitor base classes in the above table.
 4. In the `Main` method of your application:
    1. create a new instance of the filter class.
    2. Pass this instance into `Filter.Loop`.

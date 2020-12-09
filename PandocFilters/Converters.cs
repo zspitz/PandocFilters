@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OneOf;
-using PandocFilters.Types;
+using PandocFilters.Ast;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -98,7 +98,7 @@ namespace PandocFilters {
         // nameof only returns the last segment of the fully-qualified name - https://stackoverflow.com/a/38584443/111794
         private static readonly Dictionary<string, ConstructorInfo?> handledTypes =
             typeof(Pandoc).Assembly.GetTypes()
-                .Where(x => x.Namespace == $"{nameof(PandocFilters)}.{nameof(Types)}" &&!(
+                .Where(x => x.Namespace == $"{nameof(PandocFilters)}.{nameof(Ast)}" &&!(
                     x == typeof(Pandoc) ||
                     x == typeof(MetaValue)
                 ))

@@ -1,11 +1,10 @@
 ﻿using OneOf;
-using PandocFilters.RawTypes;
 using System.Collections.Immutable;
 using System.Linq;
-using DataValue = OneOf.OneOf<PandocFilters.RawTypes.TagContent, string, long, PandocFilters.RawTypes.TagContent1>;
+using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent, string, long, PandocFilters.Raw.TagContent1>;
 using ZSpitz.Util;
 
-namespace PandocFilters {
+namespace PandocFilters.Raw {
     public abstract class RawVisitorBase : IVisitor<RawPandoc> {
         public RawPandoc VisitPandoc(RawPandoc rawPandoc) =>
             rawPandoc with

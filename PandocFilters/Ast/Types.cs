@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OneOf;
 
-namespace PandocFilters.Types {
+namespace PandocFilters.Ast {
 
     public record Pandoc(
         [property:JsonProperty("pandoc-api-version")] int[] ApiVersion, 
