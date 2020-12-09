@@ -1,8 +1,7 @@
-﻿using PandocFilters.Types;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 
-namespace PandocFilters {
+namespace PandocFilters.Ast {
     public abstract class VisitorBase : IVisitor<Pandoc> {
         public virtual Pandoc VisitPandoc(Pandoc pandoc) =>
             pandoc with

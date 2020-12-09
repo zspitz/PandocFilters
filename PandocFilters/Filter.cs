@@ -2,6 +2,8 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using ZSpitz.Util;
+using PandocFilters.Ast;
+using PandocFilters.Raw;
 
 namespace PandocFilters {
     public static class Filter {

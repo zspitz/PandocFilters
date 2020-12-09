@@ -33,9 +33,4 @@
     <PackageReference Include="ZSpitz.Util" Version="0.1.81" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Ast\" />
-    <Folder Include="Raw\" />
-  </ItemGroup>
 </Project>
