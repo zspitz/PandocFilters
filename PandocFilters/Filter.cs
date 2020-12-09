@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using OneOf;
 using ZSpitz.Util;
 
 namespace PandocFilters {
@@ -17,13 +15,13 @@ namespace PandocFilters {
             new TupleConverter()
         };
 
-        private static void run<TPandoc>(JsonConverter[] converters, OneOf<FilterBase<TPandoc>, IVisitor<TPandoc>>[] transforms) {
+        private static void run<TPandoc>(JsonConverter[] converters, IVisitor<TPandoc>[] visitors) {
             string? s;
             while (true) {
                 s = Console.ReadLine();
                 if (s is null) { break; }
 
-                if (transforms.None()) {
+                if (visitors.None()) {
                     Console.WriteLine(s);
                     continue;
                 }
@@ -36,26 +34,17 @@ namespace PandocFilters {
 
                 var start = JsonConvert.DeserializeObject<TPandoc>(s, settings)!;
                 var pandoc = start;
-                foreach (var transform in transforms) {
-                    pandoc = transform.Match(
-                        filter => filter.Parse(pandoc),
-                        visitor => visitor.VisitPandoc(pandoc)
-                    );
+                foreach (var visitor in visitors) {
+                    pandoc = visitor.VisitPandoc(pandoc);
                 }
                 var serialized = JsonConvert.SerializeObject(pandoc, settings);
                 Console.WriteLine(serialized);
             }
         }
 
-        public static void Run(params OneOf<FilterBase, VisitorBase>[] transforms) =>
-            run(
-                higherConverters, 
-                transforms.Cast<OneOf<FilterBase<Types.Pandoc>, IVisitor<Types.Pandoc>>>().ToArray()
-            );
-        public static void Run(params OneOf<RawFilterBase, RawVisitorBase>[] transforms) =>
-            run(
-                rawConverters, 
-                transforms.Cast<OneOf<FilterBase<RawTypes.RawPandoc>, IVisitor<RawTypes.RawPandoc>>>().ToArray()
-            );
+        public static void Run(params VisitorBase[] visitors) =>
+            run(higherConverters, visitors);
+        public static void Run(params RawVisitorBase[] visitors) =>
+            run(rawConverters, visitors);
     }
 }

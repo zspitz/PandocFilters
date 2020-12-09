@@ -227,7 +227,7 @@ namespace PandocFilters {
         public virtual Caption VisitCaption(Caption caption) =>
             caption with
             {
-                ShortCaption = caption.ShortCaption.Select(VisitInline).ToImmutableList(),
+                ShortCaption = caption.ShortCaption?.Select(VisitInline).ToImmutableList(),
                 Blocks = caption.Blocks.Select(VisitBlock).ToImmutableList()
             };
 
