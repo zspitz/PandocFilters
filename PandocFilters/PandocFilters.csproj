@@ -17,7 +17,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>pandoc pandoc-filters pandoc-ast</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>0.1.0</Version>
 
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
