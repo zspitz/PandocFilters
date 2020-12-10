@@ -50,5 +50,8 @@ namespace PandocFilters {
 
             return token.Type == JTokenType.Object && !underlying.IsPrimitive && !(type == typeof(string));
         }
+
+        internal static void AddDelegate<T>([NotNull] ref Func<T, T>? field, Func<T, T> del) =>
+            field = field is null ? del : field.WrapWith(del);
     }
 }

@@ -4,6 +4,8 @@ using Newtonsoft.Json.Serialization;
 using ZSpitz.Util;
 using PandocFilters.Ast;
 using PandocFilters.Raw;
+using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, PandocFilters.Raw.TagContent1>;
+using OneOf;
 
 namespace PandocFilters {
     public static class Filter {
@@ -17,7 +19,7 @@ namespace PandocFilters {
             new TupleConverter()
         };
 
-        private static void run<TPandoc>(JsonConverter[] converters, IVisitor<TPandoc>[] visitors) {
+        private static void run<TPandoc>(JsonConverter[] converters, params IVisitor<TPandoc>[] visitors) {
             string? s;
             while (true) {
                 s = Console.ReadLine();
@@ -48,5 +50,11 @@ namespace PandocFilters {
             run(higherConverters, visitors);
         public static void Run(params RawVisitorBase[] visitors) =>
             run(rawConverters, visitors);
+
+        public static void Run(params OneOf<
+            Func<RawPandoc, RawPandoc>,
+            Func<TagContent?, TagContent?>,
+            Func<DataValue, DataValue>
+        >[] delegates) => run(rawConverters, new RawDelegateVisitor(delegates));
     }
 }
