@@ -50,11 +50,5 @@ namespace PandocFilters {
             run(higherConverters, visitors);
         public static void Run(params RawVisitorBase[] visitors) =>
             run(rawConverters, visitors);
-
-        public static void Run(params OneOf<
-            Func<RawPandoc, RawPandoc>,
-            Func<TagContent?, TagContent?>,
-            Func<DataValue, DataValue>
-        >[] delegates) => run(rawConverters, new RawDelegateVisitor(delegates));
     }
 }

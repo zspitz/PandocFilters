@@ -42,6 +42,8 @@ The library defines types and base classes for both levels:
 | Raw | Objects with a `t` and `c` property|  `PandocFilters.Raw` | `RawVisitorBase` |
 | Higher-level AST | e.g. `Para` type |`PandocFilters.Ast` | `VisitorBase` |
 
+The library also includes two predefined visitors -- `DelegateVisitor` and `RawDelegateVisitor` -- which can be extended by adding delegates via the `Add` method, instead of defining a new class (see below for sample).
+
 ## Usage
 
 1. Create a console application.
@@ -73,9 +75,27 @@ class RemoveImageStyling : VisitorBase {
 }
 ```
 
+Using the delegate visitor:
+
+```csharp
+using System.Diagnostics;
+using System.Linq;
+using PandocFilters;
+using PandocFilters.Types;
+
+var visitor = new DelegateVisitor();
+visitor.Add((Image image) => image with {
+    Attr = image.Attr with {
+        KeyValuePairs = ImmutableList.Create<(string, string)>()
+    }
+});
+Filter.Run(visitor);
+```
+
 ## Credits
 
 * John McFarlane and contributors for Pandoc
+* @mcintyre321, for [OneOf](https://github.com/mcintyre321/OneOf)
 * [dbramucci](https://www.reddit.com/user/dbramucci) and [Lalaithion42](https://www.reddit.com/user/Lalaithion42) for their [help in understanding Haskell data types](https://www.reddit.com/r/haskell/comments/jx9lf7/basic_guide_to_reading_haskell_type_definition/)
 
 ## Notes
