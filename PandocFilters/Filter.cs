@@ -4,8 +4,6 @@ using Newtonsoft.Json.Serialization;
 using ZSpitz.Util;
 using PandocFilters.Ast;
 using PandocFilters.Raw;
-using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, PandocFilters.Raw.TagContent1>;
-using OneOf;
 
 namespace PandocFilters {
     public static class Filter {
@@ -33,7 +31,8 @@ namespace PandocFilters {
                 var settings = new JsonSerializerSettings {
                     ContractResolver = new DefaultContractResolver { NamingStrategy = new KebabCaseNamingStrategy() },
                     Converters = converters,
-                    NullValueHandling = NullValueHandling.Ignore
+                    NullValueHandling = NullValueHandling.Ignore,
+                    DateParseHandling = DateParseHandling.None
                 };
 
                 var start = JsonConvert.DeserializeObject<TPandoc>(s, settings)!;

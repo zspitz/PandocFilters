@@ -35,7 +35,7 @@ namespace PandocFilters.Ast {
         private Func<SoftBreak, SoftBreak>? softBreakDelegate;
         private Func<LineBreak, LineBreak>? lineBreakDelegate;
         private Func<Math, Math>? mathDelegate;
-        private Func<RowInline, RowInline>? rowInlineDelegate;
+        private Func<RawInline, RawInline>? rawInlineDelegate;
         private Func<Link, Link>? linkDelegate;
         private Func<Image, Image>? imageDelegate;
         private Func<Note, Note>? noteDelegate;
@@ -82,7 +82,7 @@ namespace PandocFilters.Ast {
         public void Add(Func<SoftBreak, SoftBreak> del) => AddDelegate(ref softBreakDelegate, del);
         public void Add(Func<LineBreak, LineBreak> del) => AddDelegate(ref lineBreakDelegate, del);
         public void Add(Func<Math, Math> del) => AddDelegate(ref mathDelegate, del);
-        public void Add(Func<RowInline, RowInline> del) => AddDelegate(ref rowInlineDelegate, del);
+        public void Add(Func<RawInline, RawInline> del) => AddDelegate(ref rawInlineDelegate, del);
         public void Add(Func<Link, Link> del) => AddDelegate(ref linkDelegate, del);
         public void Add(Func<Image, Image> del) => AddDelegate(ref imageDelegate, del);
         public void Add(Func<Note, Note> del) => AddDelegate(ref noteDelegate, del);
@@ -226,9 +226,9 @@ namespace PandocFilters.Ast {
             math = mathDelegate?.Invoke(math) ?? math;
             return base.VisitMath(math);
         }
-        public override RowInline VisitRowInline(RowInline rowInline) {
-            rowInline = rowInlineDelegate?.Invoke(rowInline) ?? rowInline;
-            return base.VisitRowInline(rowInline);
+        public override RawInline VisitRawInline(RawInline rawInline) {
+            rawInline = rawInlineDelegate?.Invoke(rawInline) ?? rawInline;
+            return base.VisitRawInline(rawInline);
         }
         public override Link VisitLink(Link link) {
             link = linkDelegate?.Invoke(link) ?? link;

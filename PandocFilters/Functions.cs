@@ -23,7 +23,7 @@ namespace PandocFilters {
                 JTokenType.Date => underlying == typeof(DateTime),
                 JTokenType.TimeSpan => underlying == typeof(TimeSpan),
                 JTokenType.Integer => underlying.IsIntegral(),
-                JTokenType.Float => underlying.IsNumeric(),
+                JTokenType.Float => underlying.IsNonIntegral(),
                 JTokenType.Null => type.IsNullable(true),
                 // TODO handle other types -- Uri, Guid?
                 _ => null

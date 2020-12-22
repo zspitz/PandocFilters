@@ -72,7 +72,7 @@ namespace PandocFilters.Ast {
     public record SoftBreak : Inline;
     public record LineBreak : Inline;
     public record Math(MathType MathType, string Text) : Inline;
-    public record RowInline(string Format, string Text) : Inline;
+    public record RawInline(string Format, string Text) : Inline;
     public record Link(Attr Attr, ImmutableList<Inline> Inlines, (string Url, string Title) Target) : Inline;
     public record Image(Attr Attr, ImmutableList<Inline> Inlines, (string Url, string Title) Target) : Inline;
     public record Note(ImmutableList<Block> Blocks) : Inline;

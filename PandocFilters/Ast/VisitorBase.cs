@@ -111,7 +111,7 @@ namespace PandocFilters.Ast {
                 SoftBreak softBreak => VisitSoftBreak(softBreak),
                 LineBreak lineBreak => VisitLineBreak(lineBreak),
                 Math math => VisitMath(math),
-                RowInline rowInline => VisitRowInline(rowInline),
+                RawInline rawInline => VisitRawInline(rawInline),
                 Link link => VisitLink(link),
                 Image image => VisitImage(image),
                 Note note => VisitNote(note),
@@ -190,7 +190,7 @@ namespace PandocFilters.Ast {
 
         public virtual Math VisitMath(Math math) => math;
 
-        public virtual RowInline VisitRowInline(RowInline rowInline) => rowInline;
+        public virtual RawInline VisitRawInline(RawInline rowInline) => rowInline;
 
         public virtual Link VisitLink(Link link) =>
             link with

@@ -108,7 +108,16 @@ namespace PandocFilters {
                 ))
                 .ToDictionary()!; // SingleOrDefault should be typed as ConstructorInfo? but returns ConstructorInfo
 
-        private static readonly HashSet<string> tupleRecordNames = new() { "Attr", "Caption", "TableHead", "Row","Cell", "TableBody", "TableFoot"};
+        private static readonly HashSet<string> tupleRecordNames = new() { 
+            nameof(Attr), 
+            nameof(Caption), 
+            nameof(TableHead), 
+            nameof(Row),
+            nameof(Cell), 
+            nameof(TableBody), 
+            nameof(TableFoot), 
+            nameof(ListAttributes)
+        };
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) {
             if (value is null) { return; }
