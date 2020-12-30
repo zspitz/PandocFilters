@@ -48,11 +48,13 @@ The library also includes two predefined visitors -- `DelegateVisitor` and `RawD
 
 1. Create a console application.
 2. Install the `PandocFilters` NuGet package.
-3. Write a class inheriting from one of the visitor base classes in the above table.
-4. In the `Main` method of your application:
-   1. create a new instance of the filter class.
-   2. Pass this instance into `Filter.Loop`.
+3. Define your visitor -- either
+    a. write a class that inherits from one of the visitor base classes, and create an instance of the class, or
+    b. create an instance of the appropriate delegate visitor class, and append delegates using the `Add` methods.
+4. Pass the instance into `Filter.Run`.
 5. Either pass your program to Pandoc using `--filter`; or pipe the JSON output from Pandoc into your program, and pipe the outout back into Pandoc.
+
+Note that `Filter.Run` takes an arbitrary number of visitors -- you can create multiple visitors and pass them into `Filter.Run`.
 
 ## Sample
 
