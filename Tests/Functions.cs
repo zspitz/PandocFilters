@@ -18,7 +18,7 @@ namespace Tests {
 
             return new Process {
                 StartInfo = {
-                        FileName = $@"pandoc.exe",
+                        FileName = $@"""{pandocPath}""",
                         Arguments = args,
                         UseShellExecute = false,
                         CreateNoWindow = true,

@@ -36,22 +36,22 @@ namespace Tests {
             return files.Keys.SelectMany(doc => filters.Select(filter => (doc, filter)));
         }).ToTheoryData();
 
-        //[MemberData(nameof(TestData))]
-        //[SkippableTheory]
-        //public void AstTest(string docPath, string filterName) {
-        //    var astResult = files[docPath].json.Value;
-        //    Skip.If(
-        //        astResult.ExitCode != 0 || astResult.StdOut.IsNullOrEmpty() || !astResult.StdErr.IsNullOrEmpty(),
-        //        $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
-        //    );
+        [MemberData(nameof(TestData))]
+        [SkippableTheory]
+        public void AstTest(string docPath, string filterName) {
+            var astResult = files[docPath].ast.Value;
+            Skip.If(
+                astResult.ExitCode != 0 || astResult.StdOut.IsNullOrEmpty() || !astResult.StdErr.IsNullOrEmpty(),
+                $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
+            );
 
-        //    docPath = $"{filesRoot}\\{docPath}";
-        //    var filterPath = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe";
-        //    var result = GetAst(docPath, filterPath);
-        //    Assert.Equal("", result.StdErr);
-        //    Assert.Equal(0, result.ExitCode);
-        //    Assert.Equal(astResult.StdOut, result.StdOut);
-        //}
+            docPath = $"{filesRoot}\\{docPath}";
+            var filterPath = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe";
+            var result = GetAst(docPath, filterPath);
+            Assert.Equal("", result.StdErr);
+            Assert.Equal(0, result.ExitCode);
+            Assert.Equal(astResult.StdOut, result.StdOut);
+        }
 
         [SkippableTheory]
         [MemberData(nameof(TestData))]
