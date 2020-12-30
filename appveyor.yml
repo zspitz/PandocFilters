@@ -22,9 +22,9 @@ dotnet_csproj:
 
 before_build:
 - cmd: nuget restore
-- cmd: choco install pandoc
 
 before_test:
+- cmd: choco install pandoc
 - cmd: pandoc -v
 - cmd: "\"c:\\program files\\pandoc\\pandoc.exe\" -v"
 
