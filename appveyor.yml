@@ -24,6 +24,10 @@ before_build:
 - cmd: nuget restore
 - cmd: choco install pandoc
 
+before_test:
+- cmd: pandoc -v
+- cmd: "\"c:\\program files\\pandoc\\pandoc.exe\" -v"
+
 matrix:
   fast_finish: true
 
