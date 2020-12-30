@@ -36,52 +36,52 @@ namespace Tests {
             return files.Keys.SelectMany(doc => filters.Select(filter => (doc, filter)));
         }).ToTheoryData();
 
-        [MemberData(nameof(TestData))]
-        [SkippableTheory]
-        public void AstTest(string docPath, string filterName) {
-            var astResult = files[docPath].ast.Value;
-            Skip.If(
-                astResult.ExitCode != 0 || astResult.StdOut.IsNullOrEmpty() || !astResult.StdErr.IsNullOrEmpty(),
-                $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
-            );
+        //[MemberData(nameof(TestData))]
+        //[SkippableTheory]
+        //public void AstTest(string docPath, string filterName) {
+        //    var astResult = files[docPath].ast.Value;
+        //    Skip.If(
+        //        astResult.ExitCode != 0 || astResult.StdOut.IsNullOrEmpty() || !astResult.StdErr.IsNullOrEmpty(),
+        //        $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
+        //    );
 
-            docPath = $"{filesRoot}\\{docPath}";
-            var filterPath = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe";
-            var result = GetAst(docPath, filterPath);
-            Assert.Equal("", result.StdErr);
-            Assert.Equal(0, result.ExitCode);
-            Assert.Equal(astResult.StdOut, result.StdOut);
-        }
+        //    docPath = $"{filesRoot}\\{docPath}";
+        //    var filterPath = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe";
+        //    var result = GetAst(docPath, filterPath);
+        //    Assert.Equal("", result.StdErr);
+        //    Assert.Equal(0, result.ExitCode);
+        //    Assert.Equal(astResult.StdOut, result.StdOut);
+        //}
 
-        [SkippableTheory]
-        [MemberData(nameof(TestData))]
-        public void JsonTest(string docPath, string filterName) {
-            var jsonResult = files[docPath].json.Value;
-            Skip.If(
-                jsonResult.ExitCode != 0 || jsonResult.StdOut.IsNullOrEmpty() || !jsonResult.StdErr.IsNullOrEmpty(),
-                $"{(!jsonResult.StdErr.IsNullOrEmpty() ? jsonResult.StdErr : "")} - {(jsonResult.ExitCode != 0 ? jsonResult.ExitCode.ToString() : "")}"
-            );
+        //[SkippableTheory]
+        //[MemberData(nameof(TestData))]
+        //public void JsonTest(string docPath, string filterName) {
+        //    var jsonResult = files[docPath].json.Value;
+        //    Skip.If(
+        //        jsonResult.ExitCode != 0 || jsonResult.StdOut.IsNullOrEmpty() || !jsonResult.StdErr.IsNullOrEmpty(),
+        //        $"{(!jsonResult.StdErr.IsNullOrEmpty() ? jsonResult.StdErr : "")} - {(jsonResult.ExitCode != 0 ? jsonResult.ExitCode.ToString() : "")}"
+        //    );
 
-            var process = new Process {
-                StartInfo = {
-                    FileName = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe",
-                    UseShellExecute = false,
-                    CreateNoWindow=true,
-                    RedirectStandardInput = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true
-                },
-                EnableRaisingEvents = true
-            };
-            var result = RunProcess(process, jsonResult.StdOut);
-            Assert.Equal("", result.StdErr);
-            Assert.Equal(0, result.ExitCode);
-            Assert.True(
-                JToken.DeepEquals(
-                    JToken.Parse(jsonResult.StdOut),
-                    JToken.Parse(result.StdOut)
-                )
-            );
-        }
+        //    var process = new Process {
+        //        StartInfo = {
+        //            FileName = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe",
+        //            UseShellExecute = false,
+        //            CreateNoWindow=true,
+        //            RedirectStandardInput = true,
+        //            RedirectStandardOutput = true,
+        //            RedirectStandardError = true
+        //        },
+        //        EnableRaisingEvents = true
+        //    };
+        //    var result = RunProcess(process, jsonResult.StdOut);
+        //    Assert.Equal("", result.StdErr);
+        //    Assert.Equal(0, result.ExitCode);
+        //    Assert.True(
+        //        JToken.DeepEquals(
+        //            JToken.Parse(jsonResult.StdOut),
+        //            JToken.Parse(result.StdOut)
+        //        )
+        //    );
+        //}
     }
 }
