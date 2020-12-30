@@ -10,23 +10,22 @@ namespace PandocFilters.Ast {
             };
 
         public virtual Block VisitBlock(Block block) =>
-            block switch {
-                Plain plain => VisitPlain(plain),
-                Para para => VisitPara(para),
-                LineBlock lineBlock => VisitLineBlock(lineBlock),
-                CodeBlock codeBlock => VisitCodeBlock(codeBlock),
-                RawBlock rawBlock => VisitRawBlock(rawBlock),
-                BlockQuote blockQuote => VisitBlockQuote(blockQuote),
-                OrderedList orderedList => VisitOrderedList(orderedList),
-                BulletList bulletList => VisitBulletList(bulletList),
-                DefinitionList definitionList => VisitDefinitionList(definitionList),
-                Header header => VisitHeader(header),
-                HorizontalRule horizontalRule => VisitHorizontalRule(horizontalRule),
-                Table table => VisitTable(table),
-                Div div => VisitDiv(div),
-                Null @null => VisitNull(@null),
-                _ => throw new System.InvalidOperationException()
-            };
+            block.Match<Block>(
+                plain => VisitPlain(plain),
+                para => VisitPara(para),
+                lineBlock => VisitLineBlock(lineBlock),
+                codeBlock => VisitCodeBlock(codeBlock),
+                rawBlock => VisitRawBlock(rawBlock),
+                blockQuote => VisitBlockQuote(blockQuote),
+                orderedList => VisitOrderedList(orderedList),
+                bulletList => VisitBulletList(bulletList),
+                definitionList => VisitDefinitionList(definitionList),
+                header => VisitHeader(header),
+                horizontalRule => VisitHorizontalRule(horizontalRule),
+                table => VisitTable(table),
+                div => VisitDiv(div),
+                @null => VisitNull(@null)
+            );
 
         public virtual Plain VisitPlain(Plain plain) =>
             plain with
@@ -95,29 +94,28 @@ namespace PandocFilters.Ast {
         public virtual Null VisitNull(Null @null) => @null;
 
         public virtual Inline VisitInline(Inline inline) =>
-            inline switch {
-                Str str => VisitStr(str),
-                Emph emph => VisitEmph(emph),
-                Underline underline => VisitUnderline(underline),
-                Strong strong => VisitStrong(strong),
-                Strikeout strikeout => VisitStrikeout(strikeout),
-                Superscript superscript => VisitSuperscript(superscript),
-                Subscript subscript => VisitSubscript(subscript),
-                SmallCaps smallCaps => VisitSmallCaps(smallCaps),
-                Quoted quoted => VisitQuoted(quoted),
-                Cite cite => VisitCite(cite),
-                Code code => VisitCode(code),
-                Space space => VisitSpace(space),
-                SoftBreak softBreak => VisitSoftBreak(softBreak),
-                LineBreak lineBreak => VisitLineBreak(lineBreak),
-                Math math => VisitMath(math),
-                RawInline rawInline => VisitRawInline(rawInline),
-                Link link => VisitLink(link),
-                Image image => VisitImage(image),
-                Note note => VisitNote(note),
-                Span span => VisitSpan(span),
-                _ => throw new System.InvalidOperationException()
-            };
+            inline.Match<Inline>(
+                str => VisitStr(str),
+                emph => VisitEmph(emph),
+                underline => VisitUnderline(underline),
+                strong => VisitStrong(strong),
+                strikeout => VisitStrikeout(strikeout),
+                superscript => VisitSuperscript(superscript),
+                subscript => VisitSubscript(subscript),
+                smallCaps => VisitSmallCaps(smallCaps),
+                quoted => VisitQuoted(quoted),
+                cite => VisitCite(cite),
+                code => VisitCode(code),
+                space => VisitSpace(space),
+                softBreak => VisitSoftBreak(softBreak),
+                lineBreak => VisitLineBreak(lineBreak),
+                math => VisitMath(math),
+                rawInline => VisitRawInline(rawInline),
+                link => VisitLink(link),
+                image => VisitImage(image),
+                note => VisitNote(note),
+               span => VisitSpan(span)
+            );
 
         public virtual Str VisitStr(Str str) => str;
 

@@ -4,16 +4,28 @@ using Newtonsoft.Json.Serialization;
 using ZSpitz.Util;
 using PandocFilters.Ast;
 using PandocFilters.Raw;
+using Newtonsoft.Json.Linq;
 
 namespace PandocFilters {
     public static class Filter {
         private static readonly JsonConverter[] rawConverters = new[] {
-            new OneOfJsonConverter()
+            new OneOfJsonConverter() {
+                tokenHandler = (token, objectType, serializer) => {
+                    (object?, Type?) ret = (null,null);
+                    if (token is JObject obj && obj.ContainsKey("citationId")) {
+                        ret = (
+                            token.ToObject<Raw.Citation>(serializer),
+                            typeof(Raw.Citation)
+                        );
+                    }
+                    return ret;
+                }
+            }
         };
 
         private static readonly JsonConverter[] higherConverters = new JsonConverter[] {
-            new OneOfJsonConverter(),
             new PandocTypesConverter(),
+            new OneOfJsonConverter(),
             new TupleConverter()
         };
 
@@ -27,12 +39,13 @@ namespace PandocFilters {
                     Console.WriteLine(s);
                     continue;
                 }
-                
+
                 var settings = new JsonSerializerSettings {
-                    ContractResolver = new DefaultContractResolver { NamingStrategy = new KebabCaseNamingStrategy() },
+                    ContractResolver = new DefaultContractResolver { NamingStrategy = new CamelCaseNamingStrategy() },
                     Converters = converters,
                     NullValueHandling = NullValueHandling.Ignore,
-                    DateParseHandling = DateParseHandling.None
+                    DateParseHandling = DateParseHandling.None,
+                    MissingMemberHandling = MissingMemberHandling.Error
                 };
 
                 var start = JsonConvert.DeserializeObject<TPandoc>(s, settings)!;

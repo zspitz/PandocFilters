@@ -9,9 +9,12 @@ using System.Linq;
 using System.Reflection;
 using ZSpitz.Util;
 using static ZSpitz.Util.Functions;
+using static PandocFilters.Functions;
 
 namespace PandocFilters {
     public class OneOfJsonConverter : JsonConverter {
+        public Func<JToken, Type?, JsonSerializer, (object? value, Type? matchedType)>? tokenHandler;
+
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) {
             if (value is IOneOf of) {
                 value = of.Value;
@@ -22,15 +25,24 @@ namespace PandocFilters {
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer) {
             var token = JToken.ReadFrom(reader);
 
-            var underlying = objectType.UnderlyingIfNullable();
-            if (!Functions.IsTypeMatch(token, underlying, out var matchedType)) {
-                throw new InvalidOperationException($"Cannot map token to any subtype of '{objectType}'.");
+            object? value = null;
+            Type? matchedType = null;
+            if (tokenHandler is { }) {
+                (value, matchedType) = tokenHandler(token, objectType, serializer);
             }
 
-            // For OneOf, the implicit conversions are defined on OneOf
-            // For OneOfBase, try to find implicit conversions on objectType
-            // For Nullable<OneOf>, it's enough to return the value converted to OneOf; JSON.NET handles the conversion to Nullable
-            var value = token.ToObject(matchedType!, serializer);
+            var underlying = objectType.UnderlyingIfNullable();
+
+            if (matchedType is null) {
+                if (!IsTypeMatch(token, underlying, out matchedType)) {
+                    throw new InvalidOperationException($"Cannot map token to any subtype of '{objectType}'.");
+                }
+
+                // For OneOf, the implicit conversions are defined on OneOf
+                // For OneOfBase, try to find implicit conversions on objectType
+                // For Nullable<OneOf>, it's enough to return the value converted to OneOf; JSON.NET handles the conversion to Nullable
+                value = token.ToObject(matchedType!, serializer);
+            }
 
             var conversion = underlying.GetMethod("op_Implicit", new[] { matchedType });
             if (conversion is { }) {
@@ -38,23 +50,22 @@ namespace PandocFilters {
             }
 
             (ConversionStrategy strategy, MethodInfo? method) conversion1 = default;
+            Type? target = default;
             // try to find a constructor with a single parameter, which has an implicit conversion from the matched type to the type of the parameter
             var ctor = underlying.GetConstructors().FirstOrDefault(ctor => {
                 var prms = ctor.GetParameters();
                 if (prms.Length != 1) { return false; }
                 // TODO what if the parameter type is Nullable of the matched type?
                 // or of the conversion target?
-                conversion1= matchedType.GetImplicitConversionTo(prms[0].ParameterType.UnderlyingIfNullable());
-                return conversion1.strategy != ConversionStrategy.None;
+                conversion1 = matchedType.GetImplicitConversionTo(prms[0].ParameterType.UnderlyingIfNullable());
+                if (conversion1.strategy != ConversionStrategy.None) {
+                    target = prms[0].ParameterType.UnderlyingIfNullable();
+                    return true;
+                }
+                return false;
             });
             if (ctor is { }) {
-                var converted =
-                    conversion1.strategy switch {
-                        ConversionStrategy.Method => conversion1.method!.Invoke(null, new[] { value }),
-                        ConversionStrategy.Assignable => value,
-                        ConversionStrategy.BuiltIn => Convert.ChangeType(value, ctor.GetParameters()[0].ParameterType.UnderlyingIfNullable()),
-                        _ => throw new InvalidOperationException()
-                    };
+                var converted = ConvertTo(value, target!);
                 var ret = ctor.Invoke(new[] { converted });
                 return ret;
             }
@@ -74,7 +85,7 @@ namespace PandocFilters {
             if (token.Type == JTokenType.Null) { return null; }
 
             var underlying = objectType.UnderlyingIfNullable();
-            if (!Functions.IsTypeMatch(token, objectType, out _)) {
+            if (!IsTypeMatch(token, objectType, out _)) {
                 if (token.Type == JTokenType.Array) {
                     // return default conversion here
                     serializer.Populate(reader, existingValue!);
@@ -98,29 +109,49 @@ namespace PandocFilters {
         // nameof only returns the last segment of the fully-qualified name - https://stackoverflow.com/a/38584443/111794
         private static readonly Dictionary<string, ConstructorInfo?> handledTypes =
             typeof(Pandoc).Assembly.GetTypes()
-                .Where(x => x.Namespace == $"{nameof(PandocFilters)}.{nameof(Ast)}" &&!(
+                .Where(x => x.Namespace == $"{nameof(PandocFilters)}.{nameof(Ast)}" && !(
                     x == typeof(Pandoc) ||
                     x == typeof(MetaValue)
                 ))
                 .Select(x => (
-                    x.Name, 
+                    x.Name,
                     x.IsEnum ? null : x.GetConstructors().SingleOrDefault()
                 ))
                 .ToDictionary()!; // SingleOrDefault should be typed as ConstructorInfo? but returns ConstructorInfo
 
-        private static readonly HashSet<string> tupleRecordNames = new() { 
-            nameof(Attr), 
-            nameof(Caption), 
-            nameof(TableHead), 
+        private static readonly HashSet<string> tupleRecordNames = new() {
+            nameof(Attr),
+            nameof(Caption),
+            nameof(TableHead),
             nameof(Row),
-            nameof(Cell), 
-            nameof(TableBody), 
-            nameof(TableFoot), 
+            nameof(Cell),
+            nameof(TableBody),
+            nameof(TableFoot),
             nameof(ListAttributes)
         };
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) {
             if (value is null) { return; }
+            if (value is IOneOf oneOf) { value = oneOf.Value; }
+
+            if (value is Citation citation) {
+                // Don't know why Citation needs to be serialized as a plain object, vs. all other objects which are serialized with t and c properties
+
+                // Also, serializing the citation itself causes some kind of recursion, because PandocTypes.WriteJson will be called again from within the serialization
+                // We create a dynamic copy of the data in the citation, and serialize that.
+
+                dynamic toSerialize = new ExpandoObject();
+                toSerialize.citationId = citation.CitationId;
+                toSerialize.citationPrefix = citation.CitationPrefix;
+                toSerialize.citationSuffix = citation.CitationSuffix;
+                toSerialize.citationMode = citation.CitationMode;
+                toSerialize.citationNoteNum = citation.CitationNoteNum;
+                toSerialize.citationHash = citation.CitationHash;
+
+                serializer.Serialize(writer, toSerialize);
+                return;
+            }
+
             var type = value.GetType();
             string? t = null;
             object? c = null;
@@ -159,24 +190,42 @@ namespace PandocFilters {
             object[] args;
             switch (token.Type) {
                 case JTokenType.Object:
-                    var t = ((string)token["t"])!;
-                    if (objectType.IsEnum && token["c"] is null) {
+                    var t = (string?)token["t"];
+                    var c = token["c"];
+                    if (objectType.IsEnum && c is null) {
+                        if (t is null) { throw new InvalidOperationException(); }
                         // Enum values come in with only the `t` property
                         return Enum.Parse(objectType, t);
                     }
-                    ctor = handledTypes[t];
-                    var c = token["c"];
+
+                    // Most of the time, the concrete type of the serialized token will be at the 't' property
+                    // Sometimes (e.g. Citation), the token is just a plain object, without a 't' property.
+                    // In that case, the constructor comes from the `objectType`.
+
+                    ctor = handledTypes[t ?? objectType.Name];
                     if (ctor is null) { throw new InvalidOperationException(); }
                     parameters = ctor.GetParameters();
-                    if (parameters.Length == 0 ^ c is null) {
+                    if (c is not null && parameters.Length == 0) {
                         throw new InvalidOperationException();
                     }
-                    args = parameters.Length switch {
-                        0 => Array.Empty<object>(),
-                        1 => new[] { c!.ToObject(parameters[0].ParameterType, serializer)! },
-                        _ => ctor.GetParameters().Zip(c!).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray()
-                    };
-                    return ctor.Invoke(args);
+
+                    if (parameters.Length == 0) {
+                        args = Array.Empty<object>();
+                    } else if (c is null) {
+                        // plain object, e.g. Citation -- read constructor parameters from object properties
+                        args = parameters.Select(prm => token[prm.Name.ToCamelCase()!]!.ToObject(prm.ParameterType, serializer)!).ToArray();
+                    } else {
+                        args = (parameters.Length switch {
+                            // single JSON object
+                            1 => new[] { c!.ToObject(parameters[0].ParameterType, serializer)! },
+
+                            // JSON array
+                            _ => parameters.Zip(c!).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray()
+                        });
+                    }
+                    var ret = ctor.Invoke(args);
+                    ret = ConvertTo(ret, objectType);
+                    return ret;
                 case JTokenType.Array:
                     // some Haskell types are represented as arrays instead of objects with the t and c properties
                     ctor = objectType.GetConstructors().Single();

@@ -1,10 +1,11 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using ZSpitz.Util;
+using static ZSpitz.Util.Functions;
 
 namespace PandocFilters {
     internal static class Functions {
@@ -17,7 +18,7 @@ namespace PandocFilters {
 
             matchedType = type;
             var underlying = type.UnderlyingIfNullable();
-            bool? ret = token.Type switch {
+            return token.Type switch {
                 JTokenType.String => type == typeof(string),
                 JTokenType.Boolean => underlying == typeof(bool),
                 JTokenType.Date => underlying == typeof(DateTime),
@@ -26,32 +27,52 @@ namespace PandocFilters {
                 JTokenType.Float => underlying.IsNonIntegral(),
                 JTokenType.Null => type.IsNullable(true),
                 // TODO handle other types -- Uri, Guid?
-                _ => null
-            };
 
-            if (ret is { }) { return ret.Value; }
+                // if tuple type, and tuple arity matches, return true
+                JTokenType.Array when underlying.IsTupleType() => token.Count() == underlying.GetGenericArguments().Length,
 
-            if (token.Type == JTokenType.Array) {
-                if (underlying.IsTupleType()) {
-                    // if tuple arity and subtypes match, return true
-                    var tupleSubtypes = underlying.GetGenericArguments();
-                    return token.Count() == tupleSubtypes.Length && token.Zip(tupleSubtypes).AllT((subtoken, subtype) => IsTypeMatch(subtoken, subtype, out _));
-                } else if (type.IsArray) {
+                // if array type, and array element type matches all subtokens
+                JTokenType.Array when IIFE(() => {
                     var elementType = type.GetElementType();
                     return type.IsArray && token.All(x => IsTypeMatch(x, elementType!, out _));
-                } else if (typeof(IList).IsAssignableFrom(type)) {
-                    // TODO extract the generic parameter from the appropriate interface: IEnumerable<T>, IList<T> etc.
-                    // check for type match against the generic parameter
-                    return true;
-                }
-                // TODO handle other collection types here
-                return false;
-            }
+                }) => true,
 
-            return token.Type == JTokenType.Object && !underlying.IsPrimitive && !(type == typeof(string));
+                // .NET collection
+                JTokenType.Array when typeof(IList).IsAssignableFrom(type) => true,
+
+                JTokenType.Object => !(
+                    underlying.IsPrimitive ||
+                    type == typeof(string) ||
+                    underlying.IsEnum
+                ),
+
+                _ => false
+            };
         }
 
         internal static void AddDelegate<T>([NotNull] ref Func<T, T>? field, Func<T, T> del) =>
             field = field is null ? del : field.WrapWith(del);
+
+        internal static object? ConvertTo(object? source, Type target, ConversionStrategy? strategy, MethodInfo? method) {
+            if (source is null) {
+                return target.IsNullable(true) ? 
+                    null : 
+                    throw new InvalidCastException($"Unable to convert 'null' to '{target}'.");
+            }
+
+            if (strategy is null) {
+                (strategy, method) = source.GetType().GetImplicitConversionTo(target);
+            }
+
+            return strategy switch {
+                ConversionStrategy.Method => method!.Invoke(null, new[] { source }),
+                ConversionStrategy.Assignable => source,
+                ConversionStrategy.BuiltIn => Convert.ChangeType(source, target.UnderlyingIfNullable()),
+                _ => throw new InvalidOperationException($"Unable to find valid conversion from '{source.GetType()}' to '{target}'.")
+            };
+        }
+
+        internal static object? ConvertTo(object? source, Type target) => ConvertTo(source, target, null, null);
+
     }
 }
