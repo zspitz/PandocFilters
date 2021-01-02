@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <LangVersion>9.0</LangVersion>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
@@ -19,7 +20,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
-    <PackageReference Include="ZSpitz.Util" Version="0.1.86" />
+    <PackageReference Include="ZSpitz.Util" Version="0.1.87" />
   </ItemGroup>
 
 </Project>

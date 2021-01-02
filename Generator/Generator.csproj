@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Octokit" Version="0.48.0" />
-    <PackageReference Include="ZSpitz.Util" Version="0.1.86" />
+    <PackageReference Include="ZSpitz.Util" Version="0.1.87" />
   </ItemGroup>
 
   <ItemGroup>

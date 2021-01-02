@@ -34,7 +34,7 @@ delegates[result - 1].action();
 // 3. generate delegates overload for Filter.Run
 
 static void GeneratePandocVisitor() {
-    // The tree intenionally doesn't recurse over MetaValue -- https://github.com/zspitz/PandocFilters/issues/10
+    // The tree intentionally doesn't recurse over MetaValue -- https://github.com/zspitz/PandocFilters/issues/10
     var types = Assembly.GetAssembly(typeof(Pandoc))!.GetTypes()
         .Where(x => x.Namespace == "PandocFilters.Ast" && !x.IsEnum && x != typeof(MetaValue));
 

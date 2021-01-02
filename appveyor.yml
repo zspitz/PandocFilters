@@ -23,10 +23,8 @@ dotnet_csproj:
 before_build:
 - cmd: nuget restore
 
-before_test:
-- cmd: choco install pandoc
-- cmd: pandoc -v
-- cmd: "\"c:\\program files\\pandoc\\pandoc.exe\" -v"
+build:
+  project: PandocFilters.sln
 
 matrix:
   fast_finish: true
