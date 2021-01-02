@@ -8,7 +8,7 @@ Write Pandoc filters in .NET, using  strongly-typed data structures for the Pand
 
 [Pandoc](https://pandoc.org/) is a command-line program and Haskell library for converting documents from and to many different formats. Documents are translated from the input format to an AST (defined in the [Text.Pandoc.Definition](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) module), which is then used to create the output format.
 
-Pandoc allows writing [**filters**](https://pandoc.org/filters.html) -- programs that intercept the AST as JSON from standard input, modify the AST, and write it back out to standard output. Filters can be run using the pipe operator (`|` on Linux, `>` on Windows):
+Pandoc allows writing [**filters**](https://pandoc.org/filters.html) &mdash; programs that intercept the AST as JSON from standard input, modify the AST, and write it back out to standard output. Filters can be run using the pipe operator (`|` on Linux, `>` on Windows):
 
 ```none
 pandoc -s input.md -t json | my-filter | pandoc -s -f json -o output.html
@@ -22,7 +22,7 @@ pandoc -s input.md --filter my-filter -o output.html
 
 ## Pandoc AST
 
-Much of the JSON-serialized AST comes in the form of objects with a `t` and `c` property:
+Much of the JSON-serialized AST comes in the form of objects with a `t` and `c` property<sup>1</sup>:
 
 ```json
 {
@@ -42,17 +42,21 @@ The library defines types and base classes for both levels:
 | Raw | Objects with a `t` and `c` property|  `PandocFilters.Raw` | `RawVisitorBase` |
 | Higher-level AST | e.g. `Para` type |`PandocFilters.Ast` | `VisitorBase` |
 
-The library also includes two predefined visitors -- `DelegateVisitor` and `RawDelegateVisitor` -- which can be extended by adding delegates via the `Add` method, instead of defining a new class (see below for sample).
+The library also includes two predefined visitors &mdash; `DelegateVisitor` and `RawDelegateVisitor` &mdash; which can be extended by adding delegates via the `Add` method, instead of defining a new class (see below for sample).
+
+<sup>1. All the types in [pandoc-types](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) except for the root [Pandoc](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html#t:Pandoc) type and the [Citation](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html#t:Citation) type.</sup>
 
 ## Usage
 
 1. Create a console application.
 2. Install the `PandocFilters` NuGet package.
-3. Write a class inheriting from one of the visitor base classes in the above table.
-4. In the `Main` method of your application:
-   1. create a new instance of the filter class.
-   2. Pass this instance into `Filter.Loop`.
+3. Define your visitor &mdash; either
+   * write a class that inherits from one of the visitor base classes, and create an instance of the class, or  
+   * create an instance of the appropriate delegate visitor class, and append delegates using the `Add` methods.
+4. Pass the instance into `Filter.Run`.
 5. Either pass your program to Pandoc using `--filter`; or pipe the JSON output from Pandoc into your program, and pipe the outout back into Pandoc.
+
+Note that `Filter.Run` takes an arbitrary number of visitors &mdash; you can create multiple visitors and pass them into `Filter.Run`.
 
 ## Sample
 
