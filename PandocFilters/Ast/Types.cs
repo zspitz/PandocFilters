@@ -29,6 +29,13 @@ namespace PandocFilters.Ast {
             ImmutableList<Inline>,
             ImmutableList<Block>
         > value) : base(value) { }
+
+        public static implicit operator MetaValue(ImmutableDictionary<string,MetaValue> dict) => new MetaValue(dict);
+        public static implicit operator MetaValue(ImmutableList<MetaValue> lst) => new MetaValue(lst);
+        public static implicit operator MetaValue(bool b) => new MetaValue(b);
+        public static implicit operator MetaValue(string s) => new MetaValue(s);
+        public static implicit operator MetaValue(ImmutableList<Inline> inlines) => new MetaValue(inlines);
+        public static implicit operator MetaValue(ImmutableList<Block> blocks) => new MetaValue(blocks);
     }
 
     public class Block : OneOfBase<

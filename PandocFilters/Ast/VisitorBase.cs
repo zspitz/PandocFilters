@@ -1,5 +1,8 @@
-﻿using System.Collections.Immutable;
+﻿using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
+using ZSpitz.Util;
+using static ZSpitz.Util.Functions;
 
 namespace PandocFilters.Ast {
     public abstract class VisitorBase : IVisitor<Pandoc> {
@@ -8,6 +11,16 @@ namespace PandocFilters.Ast {
             {
                 Blocks = pandoc.Blocks.Select(VisitBlock).ToImmutableList()
             };
+
+        public virtual MetaValue VisitMetaValue(MetaValue metaValue) =>
+                metaValue.Match(
+                    dict => dict.SelectKVP((key, value) => KVP(key, VisitMetaValue(value))).ToImmutableDictionary(),
+                    lst => lst.Select(VisitMetaValue).ToImmutableList(),
+                    b => VisitMetaValue(b),
+                    s => VisitMetaValue(s),
+                    inlines => VisitMetaValue(inlines),
+                    blocks => VisitMetaValue(blocks)
+                );
 
         public virtual Block VisitBlock(Block block) =>
             block.Match<Block>(
@@ -114,7 +127,7 @@ namespace PandocFilters.Ast {
                 link => VisitLink(link),
                 image => VisitImage(image),
                 note => VisitNote(note),
-               span => VisitSpan(span)
+                span => VisitSpan(span)
             );
 
         public virtual Str VisitStr(Str str) => str;
@@ -188,7 +201,7 @@ namespace PandocFilters.Ast {
 
         public virtual Math VisitMath(Math math) => math;
 
-        public virtual RawInline VisitRawInline(RawInline rowInline) => rowInline;
+        public virtual RawInline VisitRawInline(RawInline rawInline) => rawInline;
 
         public virtual Link VisitLink(Link link) =>
             link with
@@ -227,6 +240,16 @@ namespace PandocFilters.Ast {
                 ShortCaption = caption.ShortCaption?.Select(VisitInline).ToImmutableList(),
                 Blocks = caption.Blocks.Select(VisitBlock).ToImmutableList()
             };
+
+        public virtual ColWidthBase VisitColWidthBase(ColWidthBase colWidthBase) =>
+            colWidthBase.Match<ColWidthBase>(
+                colWidth => VisitColWidth(colWidth),
+                colWidthDefault => VisitColWidthDefault(colWidthDefault)
+            );
+
+        public virtual ColWidth VisitColWidth(ColWidth colWidth) => colWidth;
+
+        public virtual ColWidthDefault VisitColWidthDefault(ColWidthDefault colWidthDefault) => colWidthDefault;
 
         public virtual Row VisitRow(Row row) =>
             row with

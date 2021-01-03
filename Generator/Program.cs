@@ -36,7 +36,12 @@ delegates[result - 1].action();
 static void GeneratePandocVisitor() {
     // The tree intentionally doesn't recurse over MetaValue -- https://github.com/zspitz/PandocFilters/issues/10
     var types = Assembly.GetAssembly(typeof(Pandoc))!.GetTypes()
-        .Where(x => x.Namespace == "PandocFilters.Ast" && !x.IsEnum && x != typeof(MetaValue));
+        .Where(x => x.Namespace == "PandocFilters.Ast" && !(
+            x.IsEnum ||
+            x.IsAssignableTo(typeof(IVisitor<Pandoc>))
+        ));
+
+    // MetaValue has to be implemented by hand
 
     var names = types.ToDictionary(
         x => x,
@@ -48,8 +53,8 @@ static void GeneratePandocVisitor() {
     );
 
     Console.WriteLine($@"
-namespace PandocFilters {{
-    public abstract class PandocVisitorBase : IVisitor<TPandoc> {{
+namespace PandocFilters.Ast {{
+    public abstract class VisitorBase : IVisitor<Pandoc> {{
         {types.Joined(@"
 
         ",
@@ -57,13 +62,27 @@ namespace PandocFilters {{
             var (name, camelCase) = names[t];
             var signature = $@"public virtual {name} Visit{name}({name} {camelCase}) =>";
 
-            if (t.IsAbstract) {
+            if (t.OneOfType()?.Name.StartsWith("OneOfBase") ?? false) {
+                if (t == typeof(MetaValue)) {
+                    return $@"{signature}
+                metaValue.Match(
+                    dict => dict.SelectKVP((key, value) => KVP(key, VisitMetaValue(value))).ToImmutableDictionary(),
+                    lst => lst.Select(VisitMetaValue).ToImmutableList(),
+                    b => VisitMetaValue(b),
+                    s => VisitMetaValue(s),
+                    inlines => VisitMetaValue(inlines),
+                    blocks => VisitMetaValue(blocks)
+                );";
+                }
+
                 return $@"{signature}
-            {camelCase} switch {{
-                {types.Where(x => x.BaseType == t).Joined(@",
-                ", subtype => $"{names[subtype].name} {names[subtype].camelCase} => Visit{names[subtype].name}({names[subtype].camelCase})")},
-                _ => throw new System.InvalidOperationException()
-            }};";
+            {camelCase}.Match<{name}>(
+                {t.OneOfSubtypes().Joined(@",
+                ", subtype => {
+                    var (name1, camelCase1) = names[subtype];
+                    return $"{camelCase1} => Visit{name1}({camelCase1})";
+                })}
+            );";
             }
 
             var properties =
@@ -114,8 +133,7 @@ static void GenerateDelegateVisitor() {
         .Where(x =>
             x.Namespace == "PandocFilters.Ast" && !(
                 x.IsEnum ||
-                x == typeof(MetaValue) ||
-                typeof(IVisitor<Pandoc>).IsAssignableFrom(x)
+                x.IsAssignableTo(typeof(IVisitor<Pandoc>))
             )
         ).Select(x => (
             name: x.Name,
@@ -128,7 +146,7 @@ static void GenerateDelegateVisitor() {
 
     Console.WriteLine(@$"
 namespace PandocFilters.Ast {{
-    internal sealed class DelegateVisitor : VisitorBase {{
+    public sealed class DelegateVisitor : VisitorBase {{
         {types.JoinedT(@"
         ", (name, camelCase) => $"private Func<{name}, {name}>? {camelCase}Delegate;")}
 

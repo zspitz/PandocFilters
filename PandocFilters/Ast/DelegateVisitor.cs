@@ -4,6 +4,7 @@ using static PandocFilters.Functions;
 namespace PandocFilters.Ast {
     public sealed class DelegateVisitor : VisitorBase {
         private Func<Pandoc, Pandoc>? pandocDelegate;
+        private Func<MetaValue, MetaValue>? metaValueDelegate;
         private Func<Block, Block>? blockDelegate;
         private Func<Plain, Plain>? plainDelegate;
         private Func<Para, Para>? paraDelegate;
@@ -43,6 +44,9 @@ namespace PandocFilters.Ast {
         private Func<ListAttributes, ListAttributes>? listAttributesDelegate;
         private Func<Attr, Attr>? attrDelegate;
         private Func<Caption, Caption>? captionDelegate;
+        private Func<ColWidthBase, ColWidthBase>? colWidthBaseDelegate;
+        private Func<ColWidth, ColWidth>? colWidthDelegate;
+        private Func<ColWidthDefault, ColWidthDefault>? colWidthDefaultDelegate;
         private Func<Row, Row>? rowDelegate;
         private Func<TableHead, TableHead>? tableHeadDelegate;
         private Func<TableBody, TableBody>? tableBodyDelegate;
@@ -51,6 +55,7 @@ namespace PandocFilters.Ast {
         private Func<Citation, Citation>? citationDelegate;
 
         public void Add(Func<Pandoc, Pandoc> del) => AddDelegate(ref pandocDelegate, del);
+        public void Add(Func<MetaValue, MetaValue> del) => AddDelegate(ref metaValueDelegate, del);
         public void Add(Func<Block, Block> del) => AddDelegate(ref blockDelegate, del);
         public void Add(Func<Plain, Plain> del) => AddDelegate(ref plainDelegate, del);
         public void Add(Func<Para, Para> del) => AddDelegate(ref paraDelegate, del);
@@ -90,6 +95,9 @@ namespace PandocFilters.Ast {
         public void Add(Func<ListAttributes, ListAttributes> del) => AddDelegate(ref listAttributesDelegate, del);
         public void Add(Func<Attr, Attr> del) => AddDelegate(ref attrDelegate, del);
         public void Add(Func<Caption, Caption> del) => AddDelegate(ref captionDelegate, del);
+        public void Add(Func<ColWidthBase, ColWidthBase> del) => AddDelegate(ref colWidthBaseDelegate, del);
+        public void Add(Func<ColWidth, ColWidth> del) => AddDelegate(ref colWidthDelegate, del);
+        public void Add(Func<ColWidthDefault, ColWidthDefault> del) => AddDelegate(ref colWidthDefaultDelegate, del);
         public void Add(Func<Row, Row> del) => AddDelegate(ref rowDelegate, del);
         public void Add(Func<TableHead, TableHead> del) => AddDelegate(ref tableHeadDelegate, del);
         public void Add(Func<TableBody, TableBody> del) => AddDelegate(ref tableBodyDelegate, del);
@@ -101,6 +109,10 @@ namespace PandocFilters.Ast {
         public override Pandoc VisitPandoc(Pandoc pandoc) {
             pandoc = pandocDelegate?.Invoke(pandoc) ?? pandoc;
             return base.VisitPandoc(pandoc);
+        }
+        public override MetaValue VisitMetaValue(MetaValue metaValue) {
+            metaValue = metaValueDelegate?.Invoke(metaValue) ?? metaValue;
+            return base.VisitMetaValue(metaValue);
         }
         public override Block VisitBlock(Block block) {
             block = blockDelegate?.Invoke(block) ?? block;
@@ -257,6 +269,18 @@ namespace PandocFilters.Ast {
         public override Caption VisitCaption(Caption caption) {
             caption = captionDelegate?.Invoke(caption) ?? caption;
             return base.VisitCaption(caption);
+        }
+        public override ColWidthBase VisitColWidthBase(ColWidthBase colWidthBase) {
+            colWidthBase = colWidthBaseDelegate?.Invoke(colWidthBase) ?? colWidthBase;
+            return base.VisitColWidthBase(colWidthBase);
+        }
+        public override ColWidth VisitColWidth(ColWidth colWidth) {
+            colWidth = colWidthDelegate?.Invoke(colWidth) ?? colWidth;
+            return base.VisitColWidth(colWidth);
+        }
+        public override ColWidthDefault VisitColWidthDefault(ColWidthDefault colWidthDefault) {
+            colWidthDefault = colWidthDefaultDelegate?.Invoke(colWidthDefault) ?? colWidthDefault;
+            return base.VisitColWidthDefault(colWidthDefault);
         }
         public override Row VisitRow(Row row) {
             row = rowDelegate?.Invoke(row) ?? row;
