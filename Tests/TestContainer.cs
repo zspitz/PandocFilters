@@ -102,22 +102,6 @@ namespace Tests {
         public void VerifyFileMapping(OneOf<bool, string> mapping) =>
             Assert.True(mapping.IsT0 || mapping.AsT1 is not null);
 
-        //private static readonly Dictionary<string, (Lazy<ProcessResult> ast, Lazy<ProcessResult> json)> files =
-        //    EnumerateFiles(filesRoot, "*.*", SearchOption.AllDirectories)
-        //        .Select(x => {
-        //            var (path, ext) = (x.Replace(filesRoot, ""), GetExtension(x));
-        //            OneOf<bool, string> mapping;
-        //            if (!extensions.TryGetValue(ext, out mapping)) {
-        //                mapping = extensions.FirstOrDefault(y => x.EndsWith(y));
-        //            }
-        //            return (path, mapping);
-        //        })
-        //        .WhereT((path, ext) => !extensionInputMapping.TryGetValue(ext, out var mapping) || !mapping.IsNullOrWhitespace())
-        //        .ToDictionary(x => x.Item1, x => (
-        //            Lazy(() => GetAst($"{filesRoot}\\{x}")),
-        //            Lazy(() => GetJson($"{filesRoot}\\{x}"))
-        //        ));
-
         private static readonly Dictionary<string, (Lazy<ProcessResult> ast, Lazy<ProcessResult> json)> generators =
             fileFormatMapping
                 .WhereKVP((path, v) => v.Match(
