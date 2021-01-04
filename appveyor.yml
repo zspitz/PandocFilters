@@ -25,6 +25,7 @@ before_build:
 
 build:
   project: PandocFilters.sln
+  verbosity: detailed
 
 matrix:
   fast_finish: true
