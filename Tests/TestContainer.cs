@@ -81,6 +81,13 @@ namespace Tests {
             ["jats-reader.xml"] = "jats"
         };
 
+        private static readonly string config =
+#if DEBUG
+            "Debug";
+#else
+            "Release";
+#endif
+
         private static readonly Dictionary<string, OneOf<bool, string>> fileFormatMapping =
             EnumerateFiles(filesRoot, "*.*", SearchOption.AllDirectories)
                 .Select(x => {
@@ -148,7 +155,7 @@ namespace Tests {
         //            "";
 
         //    docPath = $"{filesRoot}\\{docPath}";
-        //    var filterPath = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe";
+        //    var filterPath = $@"{filtersRoot}\{filterName}\bin\{config}\net5.0\{filterName}.exe";
         //    var result = GetAst(docPath, filterPath, format);
         //    Assert.Equal("", result.StdErr);
         //    Assert.Equal(0, result.ExitCode);
@@ -166,7 +173,7 @@ namespace Tests {
 
             var process = new Process {
                 StartInfo = {
-                    FileName = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe",
+                    FileName = $@"{filtersRoot}\{filterName}\bin\{config}\net5.0\{filterName}.exe",
                     UseShellExecute = false,
                     CreateNoWindow=true,
                     RedirectStandardInput = true,
