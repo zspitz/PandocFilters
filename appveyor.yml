@@ -21,7 +21,7 @@ dotnet_csproj:
   informational_version: '{version}'
 
 before_build:
-- cmd: dotnet restore
+- cmd: dotnet restore PandocFilters.sln
 
 build:
   project: PandocFilters.sln

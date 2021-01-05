@@ -5,7 +5,6 @@ using System.Reflection;
 using static Generator.Functions;
 using ZSpitz.Util;
 using System.Collections.Immutable;
-using Octokit;
 using PandocFilters;
 
 var delegates =
@@ -64,6 +63,7 @@ namespace PandocFilters.Ast {{
 
             if (t.OneOfType()?.Name.StartsWith("OneOfBase") ?? false) {
                 if (t == typeof(MetaValue)) {
+                    // Because we have an ImmutableDictionary
                     return $@"{signature}
                 metaValue.Match(
                     dict => dict.SelectKVP((key, value) => KVP(key, VisitMetaValue(value))).ToImmutableDictionary(),
