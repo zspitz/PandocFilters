@@ -97,10 +97,10 @@ namespace Tests {
                 .Values
                 .ToTheoryData();
 
-        [Theory]
-        [MemberData(nameof(FileFormatMappingData))]
-        public void VerifyFileMapping(OneOf<bool, string> mapping) =>
-            Assert.True(mapping.IsT0 || mapping.AsT1 is not null);
+        //[Theory]
+        //[MemberData(nameof(FileFormatMappingData))]
+        //public void VerifyFileMapping(OneOf<bool, string> mapping) =>
+        //    Assert.True(mapping.IsT0 || mapping.AsT1 is not null);
 
         private static readonly Dictionary<string, (Lazy<ProcessResult> ast, Lazy<ProcessResult> json)> generators =
             fileFormatMapping
@@ -126,33 +126,34 @@ namespace Tests {
 
         public static TheoryData<string, string> TestData = IIFE(() => {
             var filters = EnumerateDirectories(filtersRoot).Select(x => GetFileName(x)!);
-            return generators.Keys.SelectMany(doc => filters.Select(filter => (doc, filter)));
+            return generators.Keys.SelectMany(doc => filters.Select(filter => (doc, filter)))
+            .Take(20);
         }).ToTheoryData();
 
-        [MemberData(nameof(TestData))]
-        [SkippableTheory]
-        public void AstTest(string docPath, string filterName) {
-            var astResult = generators[docPath].ast.Value;
-            Skip.If(
-                astResult.ExitCode != 0 || astResult.StdOut.IsNullOrEmpty() || !astResult.StdErr.IsNullOrEmpty(),
-                $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
-            );
+        //[MemberData(nameof(TestData))]
+        //[SkippableTheory]
+        //public void AstTest(string docPath, string filterName) {
+        //    var astResult = generators[docPath].ast.Value;
+        //    Skip.If(
+        //        astResult.ExitCode != 0 || astResult.StdOut.IsNullOrEmpty() || !astResult.StdErr.IsNullOrEmpty(),
+        //        $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
+        //    );
 
-            var format =
-                fileFormatMapping.TryGetValue(docPath, out var v) ?
-                    v.Match(
-                        b => "",
-                        s => s
-                    ) :
-                    "";
+        //    var format =
+        //        fileFormatMapping.TryGetValue(docPath, out var v) ?
+        //            v.Match(
+        //                b => "",
+        //                s => s
+        //            ) :
+        //            "";
 
-            docPath = $"{filesRoot}\\{docPath}";
-            var filterPath = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe";
-            var result = GetAst(docPath, filterPath, format);
-            Assert.Equal("", result.StdErr);
-            Assert.Equal(0, result.ExitCode);
-            Assert.Equal(astResult.StdOut, result.StdOut);
-        }
+        //    docPath = $"{filesRoot}\\{docPath}";
+        //    var filterPath = $@"{filtersRoot}\{filterName}\bin\Debug\net5.0\{filterName}.exe";
+        //    var result = GetAst(docPath, filterPath, format);
+        //    Assert.Equal("", result.StdErr);
+        //    Assert.Equal(0, result.ExitCode);
+        //    Assert.Equal(astResult.StdOut, result.StdOut);
+        //}
 
         [SkippableTheory]
         [MemberData(nameof(TestData))]

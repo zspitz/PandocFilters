@@ -8,18 +8,18 @@ using ZSpitz.Util;
 
 namespace Tests {
     public static class Functions {
-        const string pandocPath = @"c:\Program Files\Pandoc\pandoc.exe";
+        const string pandocPath = @"C:\Program Files\Pandoc\pandoc.exe";
 
         private static Process getProcess(string docPath, string filter = "", string outputFormat = "native", string inputFormat = "") {
             if (docPath.IsNullOrWhitespace()) { throw new InvalidOperationException("Missing document path."); }
-            string args = docPath;
+            var args = docPath;
             if (!inputFormat.IsNullOrWhitespace()) { args += $" --from {inputFormat}"; }
             if (!outputFormat.IsNullOrWhitespace()) { args += $" --to {outputFormat}"; }
             if (!filter.IsNullOrWhitespace()) { args += $" --filter {filter}"; }
 
             return new Process {
                 StartInfo = {
-                        FileName = $@"""{pandocPath}""",
+                        FileName = pandocPath,
                         Arguments = args,
                         UseShellExecute = false,
                         CreateNoWindow = true,
