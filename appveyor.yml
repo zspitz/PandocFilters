@@ -22,10 +22,10 @@ dotnet_csproj:
 
 before_build:
 - cmd: dotnet restore PandocFilters.sln
+- cmd: choco install pandoc
 
 build:
   project: PandocFilters.sln
-  verbosity: detailed
 
 matrix:
   fast_finish: true
