@@ -44,6 +44,8 @@ The library defines types and base classes for both levels:
 
 The library also includes two predefined visitors &mdash; `DelegateVisitor` and `RawDelegateVisitor` &mdash; which can be extended by adding delegates via the `Add` method, instead of defining a new class (see below for sample).
 
+Note that the library uses C# 9 record types for immutability, which avoids having to worry about circular references when serializing. If you're using C# 9 or later, you can use the `with` keyword to modify the returned instance; otherwise you'll have to pass in all arguments to the constructor.
+
 <sup>1. All the types in [pandoc-types](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) except for the root [Pandoc](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html#t:Pandoc) type and the [Citation](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html#t:Citation) type.</sup>
 
 ## Usage
