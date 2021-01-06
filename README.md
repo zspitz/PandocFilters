@@ -44,8 +44,6 @@ The library defines types and base classes for both levels:
 
 The library also includes two predefined visitors &mdash; `DelegateVisitor` and `RawDelegateVisitor` &mdash; which can be extended by adding delegates via the `Add` method, instead of defining a new class (see below for sample).
 
-Note that the library uses C# 9 record types (and [System.Collections.Immutable](https://docs.microsoft.com/en-us/dotnet/api/system.collections.immutable?view=net-5.0#remarks)) to enforce immutability, which avoids having to worry about circular references when serializing. If you're using C# 9 or later, you can use the `with` keyword to modify the returned instance; otherwise you'll have to pass in all arguments to the constructor.
-
 <sup>1. All the types in [pandoc-types](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html) except for the root [Pandoc](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html#t:Pandoc) type and the [Citation](https://hackage.haskell.org/package/pandoc-types-1.22/docs/Text-Pandoc-Definition.html#t:Citation) type.</sup>
 
 ## Usage
@@ -107,3 +105,4 @@ Filter.Run(visitor);
 ## Notes
 
 * PandocFilters is written against the types in [**pandoc-types 1.22**](https://hackage.haskell.org/package/pandoc-types-1.22). When pandoc-types is updated, code written against the raw types will successfully receive the JSON-source data structures; while code written against the higher-level types will conceivably fail in the JSON parsing stage.
+* The library uses C# 9 record types (and [System.Collections.Immutable](https://docs.microsoft.com/en-us/dotnet/api/system.collections.immutable?view=net-5.0#remarks)) to enforce immutability; otherwise we'd have to check for circular references before serializing. If you're using C# 9 or later, you can use the `with` keyword to modify the returned instance; otherwise you'll have to pass in all arguments to the constructor.
