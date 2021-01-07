@@ -207,14 +207,14 @@ namespace PandocFilters.Ast {
             link with
             {
                 Attr = VisitAttr(link.Attr),
-                Inlines = link.Inlines.Select(VisitInline).ToImmutableList()
+                AltText = link.AltText.Select(VisitInline).ToImmutableList()
             };
 
         public virtual Image VisitImage(Image image) =>
             image with
             {
                 Attr = VisitAttr(image.Attr),
-                Inlines = image.Inlines.Select(VisitInline).ToImmutableList()
+                AltText = image.AltText.Select(VisitInline).ToImmutableList()
             };
 
         public virtual Note VisitNote(Note note) =>

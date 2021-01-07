@@ -19,13 +19,13 @@ namespace Tests {
 
             return new Process {
                 StartInfo = {
-                        FileName = pandocPath,
-                        Arguments = args,
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true
-                    },
+                    FileName = pandocPath,
+                    Arguments = args,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                },
                 EnableRaisingEvents = true
             };
         }

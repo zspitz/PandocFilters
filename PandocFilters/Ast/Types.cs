@@ -195,8 +195,8 @@ namespace PandocFilters.Ast {
     public record LineBreak;
     public record Math(MathType MathType, string Text);
     public record RawInline(string Format, string Text);
-    public record Link(Attr Attr, ImmutableList<Inline> Inlines, (string Url, string Title) Target);
-    public record Image(Attr Attr, ImmutableList<Inline> Inlines, (string Url, string Title) Target);
+    public record Link(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target);
+    public record Image(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target);
     public record Note(ImmutableList<Block> Blocks);
     public record Span(Attr Attr, ImmutableList<Inline> Inlines);
 
