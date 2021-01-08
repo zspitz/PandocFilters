@@ -87,19 +87,24 @@ namespace PandocFilters.Ast {
         public static implicit operator Block(Null @null) => new Block(@null);
     }
 
+    /// <summary>Plain text, not a paragraph</summary>
     public record Plain(ImmutableList<Inline> Inlines);
+    /// <summary>Paragraph</summary>
     public record Para(ImmutableList<Inline> Inlines);
+    /// <summary>Multiple non-breaking lines</summary>
     public record LineBlock(ImmutableList<ImmutableList<Inline>> NestedInlines);
+    /// <summary>Code block (literal) with attributes</summary>
     public record CodeBlock(Attr Attr, string Code);
     public record RawBlock(string Format, string Text);
     public record BlockQuote(ImmutableList<Block> Blocks);
-    public record OrderedList(ListAttributes ListAttributes, ImmutableList<ImmutableList<Block>> NestedBlocks);
-    public record BulletList(ImmutableList<ImmutableList<Block>> NestedBlocks);
+    public record OrderedList(ListAttributes ListAttributes, ImmutableList<ImmutableList<Block>> ListItems);
+    public record BulletList(ImmutableList<ImmutableList<Block>> ListItems);
     public record DefinitionList(ImmutableList<(ImmutableList<Inline> term, ImmutableList<ImmutableList<Block>> definitions)> Items);
     public record Header(int Level, Attr Attr, ImmutableList<Inline> Text);
     public record HorizontalRule;
 
     // represent ColWidth as a double?
+    /// <param name="ColSpecs">Specifications for each table column</summary>
     public record Table(
         Attr Attr,
         Caption Caption,
@@ -108,6 +113,8 @@ namespace PandocFilters.Ast {
         ImmutableList<TableBody> TableBodies,
         TableFoot TableFoot
     );
+
+    /// <summary>Generic block container with attributes</summary>
     public record Div(Attr Attr, ImmutableList<Block> Blocks);
     public record Null;
 
@@ -189,6 +196,7 @@ namespace PandocFilters.Ast {
     public record SmallCaps(ImmutableList<Inline> Inlines);
     public record Quoted(QuoteType QuoteType, ImmutableList<Inline> Inlines);
     public record Cite(ImmutableList<Citation> Citations, ImmutableList<Inline> Inlines);
+    /// <summary>Inline code</summary>
     public record Code(Attr Attr, string Text);
     public record Space;
     public record SoftBreak;
@@ -197,7 +205,9 @@ namespace PandocFilters.Ast {
     public record RawInline(string Format, string Text);
     public record Link(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target);
     public record Image(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target);
+    /// <summary>Footnote or endnote</summary>
     public record Note(ImmutableList<Block> Blocks);
+    /// <summary>Generic inline container with attributes</summary>
     public record Span(Attr Attr, ImmutableList<Inline> Inlines);
 
     public record ListAttributes(int StartNumber, ListNumberStyle ListNumberStyle, ListNumberDelim ListNumberDelim);
@@ -225,6 +235,7 @@ namespace PandocFilters.Ast {
     public record Attr(string Identifier, ImmutableList<string> Classes, ImmutableList<(string, string)> KeyValuePairs);
 
     /// <summary>The caption of a table, with an optional short caption.</summary>
+    /// <param name="ShortCaption">A short caption, for use in, for instance, lists of figures.</param>
     public record Caption(ImmutableList<Inline>? ShortCaption, ImmutableList<Block> Blocks);
 
     // replace ShortCaption with ImmutableList<Inline>
@@ -238,12 +249,14 @@ namespace PandocFilters.Ast {
         AlignDefault
     }
 
+    /// <summary>The width of a table column, as a fraction of the total table width.</summary>
     public class ColWidthBase : OneOfBase<ColWidth, ColWidthDefault> {
         private ColWidthBase(OneOf<ColWidth, ColWidthDefault> value) : base(value) { }
         public static implicit operator ColWidthBase(ColWidth value) => new ColWidthBase(value);
         public static implicit operator ColWidthBase(ColWidthDefault colWidthDefault) => new ColWidthBase(colWidthDefault);
     }
 
+    /// <summary>The width of a table column, as a fraction of the total table width.</summary>
     public record ColWidth(double Double);
     public record ColWidthDefault();
 
@@ -253,7 +266,9 @@ namespace PandocFilters.Ast {
 
     public record TableHead(Attr Attr, ImmutableList<Row> Rows);
 
-    public record TableBody(Attr Attr, int RowReadColumns, ImmutableList<Row> Rows1, ImmutableList<Row> Rows2);
+    /// <summary>A body of a table, with an intermediate head, intermediate body, and the specified number of row header columns in the intermediate body.</summary>
+    /// <param name="RowHeadColumns">The number of columns taken up by the row head of each row of the <c>TableBody</c>. The row body takes up the remaining columns.</param>
+    public record TableBody(Attr Attr, int RowHeadColumns, ImmutableList<Row> IntermediateHead, ImmutableList<Row> IntermediateBody);
 
     public record TableFoot(Attr Attr, ImmutableList<Row> Rows);
 

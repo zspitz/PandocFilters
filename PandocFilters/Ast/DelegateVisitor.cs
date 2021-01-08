@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using static PandocFilters.Functions;
 
 namespace PandocFilters.Ast {
@@ -12,6 +13,7 @@ namespace PandocFilters.Ast {
         private Func<CodeBlock, CodeBlock>? codeBlockDelegate;
         private Func<RawBlock, RawBlock>? rawBlockDelegate;
         private Func<BlockQuote, BlockQuote>? blockQuoteDelegate;
+        private Func<ImmutableList<Block>, ImmutableList<Block>>? listItemDelegate;
         private Func<OrderedList, OrderedList>? orderedListDelegate;
         private Func<BulletList, BulletList>? bulletListDelegate;
         private Func<DefinitionList, DefinitionList>? definitionListDelegate;
@@ -63,6 +65,7 @@ namespace PandocFilters.Ast {
         public void Add(Func<CodeBlock, CodeBlock> del) => AddDelegate(ref codeBlockDelegate, del);
         public void Add(Func<RawBlock, RawBlock> del) => AddDelegate(ref rawBlockDelegate, del);
         public void Add(Func<BlockQuote, BlockQuote> del) => AddDelegate(ref blockQuoteDelegate, del);
+        public void Add(Func<ImmutableList<Block>, ImmutableList<Block>> del) => AddDelegate(ref listItemDelegate, del);
         public void Add(Func<OrderedList, OrderedList> del) => AddDelegate(ref orderedListDelegate, del);
         public void Add(Func<BulletList, BulletList> del) => AddDelegate(ref bulletListDelegate, del);
         public void Add(Func<DefinitionList, DefinitionList> del) => AddDelegate(ref definitionListDelegate, del);
@@ -141,6 +144,10 @@ namespace PandocFilters.Ast {
         public override BlockQuote VisitBlockQuote(BlockQuote blockQuote) {
             blockQuote = blockQuoteDelegate?.Invoke(blockQuote) ?? blockQuote;
             return base.VisitBlockQuote(blockQuote);
+        }
+        public override ImmutableList<Block> VisitListItem(ImmutableList<Block> listItem) {
+            listItem = listItemDelegate?.Invoke(listItem) ?? listItem;
+            return base.VisitListItem(listItem);
         }
         public override OrderedList VisitOrderedList(OrderedList orderedList) {
             orderedList = orderedListDelegate?.Invoke(orderedList) ?? orderedList;

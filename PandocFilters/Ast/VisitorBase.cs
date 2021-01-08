@@ -68,13 +68,21 @@ namespace PandocFilters.Ast {
                 Blocks = blockQuote.Blocks.Select(VisitBlock).ToImmutableList()
             };
 
+        public virtual ImmutableList<Block> VisitListItem(ImmutableList<Block> listItem) => 
+            listItem.Select(VisitBlock).ToImmutableList();
+
         public virtual OrderedList VisitOrderedList(OrderedList orderedList) =>
             orderedList with
             {
-                ListAttributes = VisitListAttributes(orderedList.ListAttributes)
+                ListAttributes = VisitListAttributes(orderedList.ListAttributes),
+                ListItems = orderedList.ListItems.Select(VisitListItem).ToImmutableList()
             };
 
-        public virtual BulletList VisitBulletList(BulletList bulletList) => bulletList;
+        public virtual BulletList VisitBulletList(BulletList bulletList) =>
+            bulletList with
+            {
+                ListItems = bulletList.ListItems.Select(VisitListItem).ToImmutableList()
+            };
 
         public virtual DefinitionList VisitDefinitionList(DefinitionList definitionList) => definitionList;
 
@@ -269,8 +277,8 @@ namespace PandocFilters.Ast {
             tableBody with
             {
                 Attr = VisitAttr(tableBody.Attr),
-                Rows1 = tableBody.Rows1.Select(VisitRow).ToImmutableList(),
-                Rows2 = tableBody.Rows2.Select(VisitRow).ToImmutableList()
+                IntermediateBody = tableBody.IntermediateBody.Select(VisitRow).ToImmutableList(),
+                IntermediateHead = tableBody.IntermediateHead.Select(VisitRow).ToImmutableList()
             };
 
         public virtual TableFoot VisitTableFoot(TableFoot tableFoot) =>
