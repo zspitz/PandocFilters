@@ -1,7 +1,10 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using OneOf;
+using ZSpitz.Util;
+using static PandocFilters.Functions;
 
 namespace PandocFilters.Ast {
 
@@ -88,11 +91,18 @@ namespace PandocFilters.Ast {
     }
 
     /// <summary>Plain text, not a paragraph</summary>
-    public record Plain(ImmutableList<Inline> Inlines);
+    public record Plain(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
     /// <summary>Paragraph</summary>
-    public record Para(ImmutableList<Inline> Inlines);
+    public record Para(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
     /// <summary>Multiple non-breaking lines</summary>
     public record LineBlock(ImmutableList<ImmutableList<Inline>> NestedInlines);
+
     /// <summary>Code block (literal) with attributes</summary>
     public record CodeBlock(Attr Attr, string Code);
     public record RawBlock(string Format, string Text);
@@ -142,25 +152,25 @@ namespace PandocFilters.Ast {
         Span
     > {
         private Inline(OneOf<
-            Str, 
-            Emph, 
-            Underline, 
-            Strong, 
-            Strikeout, 
-            Superscript, 
-            Subscript, 
-            SmallCaps, 
-            Quoted, 
-            Cite, 
-            Code, 
-            Space, 
-            SoftBreak, 
-            LineBreak, 
-            Math, 
-            RawInline, 
-            Link, 
-            Image, 
-            Note, 
+            Str,
+            Emph,
+            Underline,
+            Strong,
+            Strikeout,
+            Superscript,
+            Subscript,
+            SmallCaps,
+            Quoted,
+            Cite,
+            Code,
+            Space,
+            SoftBreak,
+            LineBreak,
+            Math,
+            RawInline,
+            Link,
+            Image,
+            Note,
             Span
         > value) : base(value) { }
 
@@ -184,31 +194,94 @@ namespace PandocFilters.Ast {
         public static implicit operator Inline(Image image) => new Inline(image);
         public static implicit operator Inline(Note note) => new Inline(note);
         public static implicit operator Inline(Span span) => new Inline(span);
+
+        public override string ToString() => Value.ToString();
     }
 
-    public record Str(string Text);
-    public record Emph(ImmutableList<Inline> Inlines);
-    public record Underline(ImmutableList<Inline> Inlines);
-    public record Strong(ImmutableList<Inline> Inlines);
-    public record Strikeout(ImmutableList<Inline> Inlines);
-    public record Superscript(ImmutableList<Inline> Inlines);
-    public record Subscript(ImmutableList<Inline> Inlines);
-    public record SmallCaps(ImmutableList<Inline> Inlines);
-    public record Quoted(QuoteType QuoteType, ImmutableList<Inline> Inlines);
+    public record Str(string Text) {
+        public override string ToString() => Text;
+    };
+
+    public record Emph(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
+    public record Underline(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
+    public record Strong(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
+    public record Strikeout(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
+    public record Superscript(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
+    public record Subscript(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
+    public record SmallCaps(ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
+
+    public record Quoted(QuoteType QuoteType, ImmutableList<Inline> Inlines) {
+        public override string ToString() {
+            var quote =
+                QuoteType switch {
+                    QuoteType.SingleQuote => '\'',
+                    QuoteType.DoubleQuote => '"',
+                    _ => throw new NotImplementedException()
+                };
+            return $"{quote}{Inlines.Joined()}{quote}";
+        }
+    }
+
     public record Cite(ImmutableList<Citation> Citations, ImmutableList<Inline> Inlines);
+
     /// <summary>Inline code</summary>
-    public record Code(Attr Attr, string Text);
-    public record Space;
-    public record SoftBreak;
-    public record LineBreak;
-    public record Math(MathType MathType, string Text);
+    public record Code(Attr Attr, string Text) {
+        public override string ToString() => Text;
+    }
+
+    public record Space {
+        public override string ToString() => " ";
+    }
+
+    public record SoftBreak {
+        public override string ToString() => "\n";
+    }
+
+    public record LineBreak {
+        public override string ToString() => "\n";
+    }
+
+    public record Math(MathType MathType, string Text) {
+        public override string ToString() => $" {Text} ";
+    }
+
     public record RawInline(string Format, string Text);
-    public record Link(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target);
-    public record Image(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target);
+
+    public record Link(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target) {
+        public override string ToString() => WriteTarget(Target);
+    };
+
+    public record Image(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target) {
+        public override string ToString() => WriteTarget(Target);
+    };
+
     /// <summary>Footnote or endnote</summary>
     public record Note(ImmutableList<Block> Blocks);
+
     /// <summary>Generic inline container with attributes</summary>
-    public record Span(Attr Attr, ImmutableList<Inline> Inlines);
+    public record Span(Attr Attr, ImmutableList<Inline> Inlines) {
+        public override string ToString() => Inlines.Joined();
+    }
 
     public record ListAttributes(int StartNumber, ListNumberStyle ListNumberStyle, ListNumberDelim ListNumberDelim);
 

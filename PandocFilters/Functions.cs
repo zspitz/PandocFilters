@@ -1,9 +1,12 @@
 ﻿using Newtonsoft.Json.Linq;
+using PandocFilters.Ast;
 using System;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using ZSpitz.Util;
 using static ZSpitz.Util.Functions;
 
@@ -55,8 +58,8 @@ namespace PandocFilters {
 
         internal static object? ConvertTo(object? source, Type target, ConversionStrategy? strategy, MethodInfo? method) {
             if (source is null) {
-                return target.IsNullable(true) ? 
-                    null : 
+                return target.IsNullable(true) ?
+                    null :
                     throw new InvalidCastException($"Unable to convert 'null' to '{target}'.");
             }
 
@@ -74,5 +77,20 @@ namespace PandocFilters {
 
         internal static object? ConvertTo(object? source, Type target) => ConvertTo(source, target, null, null);
 
+        internal static bool WriteReturn(StringBuilder sb, string s) {
+            sb.Append(s);
+            return true;
+        }
+        internal static bool WriteReturn(StringBuilder sb, char c) {
+            sb.Append(c);
+            return true;
+        }
+        internal static string WriteTarget((string Url, string Title) target) {
+            var (url, title) = target;
+            return title.IsNullOrWhitespace() ?
+                $" {url} " :
+                $"[{title}]({url})";
+        }
     }
 }
+
