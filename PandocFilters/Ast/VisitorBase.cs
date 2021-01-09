@@ -68,9 +68,6 @@ namespace PandocFilters.Ast {
                 Blocks = blockQuote.Blocks.Select(VisitBlock).ToImmutableList()
             };
 
-        public virtual ImmutableList<Block> VisitListItem(ImmutableList<Block> listItem) => 
-            listItem.Select(VisitBlock).ToImmutableList();
-
         public virtual OrderedList VisitOrderedList(OrderedList orderedList) =>
             orderedList with
             {
@@ -277,8 +274,8 @@ namespace PandocFilters.Ast {
             tableBody with
             {
                 Attr = VisitAttr(tableBody.Attr),
-                IntermediateBody = tableBody.IntermediateBody.Select(VisitRow).ToImmutableList(),
-                IntermediateHead = tableBody.IntermediateHead.Select(VisitRow).ToImmutableList()
+                IntermediateHead = tableBody.IntermediateHead.Select(VisitRow).ToImmutableList(),
+                IntermediateBody = tableBody.IntermediateBody.Select(VisitRow).ToImmutableList()
             };
 
         public virtual TableFoot VisitTableFoot(TableFoot tableFoot) =>
@@ -301,5 +298,8 @@ namespace PandocFilters.Ast {
                 CitationPrefix = citation.CitationPrefix.Select(VisitInline).ToImmutableList(),
                 CitationSuffix = citation.CitationSuffix.Select(VisitInline).ToImmutableList()
             };
+
+        public virtual ImmutableList<Block> VisitListItem(ImmutableList<Block> listItem) =>
+            listItem.Select(VisitBlock).ToImmutableList();
     }
 }

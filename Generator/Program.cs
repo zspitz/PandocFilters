@@ -89,7 +89,8 @@ namespace PandocFilters.Ast {{
                 t.GetProperties()
                     .Where(x =>
                         x.PropertyType.In(types) ||
-                        (x.PropertyType.IsGenericType && x.PropertyType.GetGenericArguments().First().In(types))
+                        (x.PropertyType.IsGenericType && x.PropertyType.GetGenericArguments().First().In(types)) ||
+                        x.Name == "ListItems"
                     )
                     .ToArray();
             if (properties.None()) {
@@ -101,6 +102,10 @@ namespace PandocFilters.Ast {{
                 {properties.Joined(@",
                 ",
                 prp => {
+                    if (prp.Name == "ListItems") {
+                        return $"ListItems = {camelCase}.ListItems.Select(VisitListItem).ToImmutableList()";
+                    }
+
                     var (isGeneric, firstArg, def) = Generics(prp.PropertyType);
                     if (!isGeneric) {
                         return $"{prp.Name} = Visit{prp.PropertyType.Name}({camelCase}.{prp.Name})";
@@ -108,8 +113,9 @@ namespace PandocFilters.Ast {{
                     if (def == typeof(ImmutableList<>)) {
                         var (isGeneric1, firstArg1, def1) = Generics(firstArg!);
                         if (!isGeneric1) {
+                            var nullable = prp.Name == "ShortCaption" ? "?" : "";
                             // Rows = tableHead.Rows.Select(VisitRow)
-                            return $"{prp.Name} = {camelCase}.{prp.Name}.Select(Visit{names[firstArg!].name}).ToImmutableList()";
+                            return $"{prp.Name} = {camelCase}.{prp.Name}{nullable}.Select(Visit{names[firstArg!].name}).ToImmutableList()";
                         }
                         if (def1 == typeof(ImmutableList<>)) {
                             // NestedInlines = lineBlock.NestedInlines.Select(x => 
@@ -123,12 +129,16 @@ namespace PandocFilters.Ast {{
                 })}
             }};";
         })}
+
+        public virtual ImmutableList<Block> VisitListItem(ImmutableList<Block> listItem) => 
+            listItem.Select(VisitBlock).ToImmutableList();
     }}
 }}
 ");
 }
 
 static void GenerateDelegateVisitor() {
+    throw new NotImplementedException("Generator doesn't output VisitListItem override.");
     var types = Assembly.GetAssembly(typeof(Pandoc))!.GetTypes()
         .Where(x =>
             x.Namespace == "PandocFilters.Ast" && !(
