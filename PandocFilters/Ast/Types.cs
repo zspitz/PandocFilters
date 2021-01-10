@@ -92,12 +92,12 @@ namespace PandocFilters.Ast {
 
     /// <summary>Plain text, not a paragraph</summary>
     public record Plain(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     /// <summary>Paragraph</summary>
     public record Para(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     /// <summary>Multiple non-breaking lines</summary>
@@ -203,31 +203,31 @@ namespace PandocFilters.Ast {
     };
 
     public record Emph(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record Underline(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record Strong(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record Strikeout(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record Superscript(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record Subscript(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record SmallCaps(ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record Quoted(QuoteType QuoteType, ImmutableList<Inline> Inlines) {
@@ -238,7 +238,7 @@ namespace PandocFilters.Ast {
                     QuoteType.DoubleQuote => '"',
                     _ => throw new NotImplementedException()
                 };
-            return $"{quote}{Inlines.Joined()}{quote}";
+            return $"{quote}{Inlines.Joined("")}{quote}";
         }
     }
 
@@ -280,7 +280,7 @@ namespace PandocFilters.Ast {
 
     /// <summary>Generic inline container with attributes</summary>
     public record Span(Attr Attr, ImmutableList<Inline> Inlines) {
-        public override string ToString() => Inlines.Joined();
+        public override string ToString() => Inlines.Joined("");
     }
 
     public record ListAttributes(int StartNumber, ListNumberStyle ListNumberStyle, ListNumberDelim ListNumberDelim);

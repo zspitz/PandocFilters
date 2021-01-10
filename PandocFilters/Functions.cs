@@ -77,14 +77,6 @@ namespace PandocFilters {
 
         internal static object? ConvertTo(object? source, Type target) => ConvertTo(source, target, null, null);
 
-        internal static bool WriteReturn(StringBuilder sb, string s) {
-            sb.Append(s);
-            return true;
-        }
-        internal static bool WriteReturn(StringBuilder sb, char c) {
-            sb.Append(c);
-            return true;
-        }
         internal static string WriteTarget((string Url, string Title) target) {
             var (url, title) = target;
             return title.IsNullOrWhitespace() ?
