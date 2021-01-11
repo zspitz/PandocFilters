@@ -66,14 +66,17 @@ using System.Linq;
 using PandocFilters;
 using PandocFilters.Types;
 
-var visitor = new RemoveImageStyling();
+var visitor = new RemoveImagePositioning();
 Filter.Run(visitor);
 
-class RemoveImageStyling : VisitorBase {
+class RemoveImagePositioning : VisitorBase {
     public override Image VisitImage(Image image) =>
         image with {
             Attr = image.Attr with {
-                KeyValuePairs = ImmutableList.Create<(string, string)>()
+                KeyValuePairs = 
+                    img.Attr.KeyValuePairs
+                        .Where(x => x.Item1 != "height" && x.Item1 != "width"))
+                        .ToImmutableList()
             }
         };
 }
@@ -90,7 +93,11 @@ using PandocFilters.Types;
 var visitor = new DelegateVisitor();
 visitor.Add((Image image) => image with {
     Attr = image.Attr with {
-        KeyValuePairs = ImmutableList.Create<(string, string)>()
+        KeyValuePairs =
+            img.Attr.KeyValuePairs
+                .Where(x => x.Item1 != "height" && x.Item1 != "width"))
+                .ToImmutableList()
+
     }
 });
 Filter.Run(visitor);
