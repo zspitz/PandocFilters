@@ -104,13 +104,20 @@ namespace PandocFilters.Ast {
     public record LineBlock(ImmutableList<ImmutableList<Inline>> NestedInlines);
 
     /// <summary>Code block (literal) with attributes</summary>
-    public record CodeBlock(Attr Attr, string Code);
+    public record CodeBlock(Attr Attr, string Code) {
+        public override string ToString() => Code; 
+    }
+
     public record RawBlock(string Format, string Text);
     public record BlockQuote(ImmutableList<Block> Blocks);
     public record OrderedList(ListAttributes ListAttributes, ImmutableList<ImmutableList<Block>> ListItems);
     public record BulletList(ImmutableList<ImmutableList<Block>> ListItems);
     public record DefinitionList(ImmutableList<(ImmutableList<Inline> term, ImmutableList<ImmutableList<Block>> definitions)> Items);
-    public record Header(int Level, Attr Attr, ImmutableList<Inline> Text);
+
+    public record Header(int Level, Attr Attr, ImmutableList<Inline> Text) {
+        public override string ToString() => Text.Joined("");
+    }
+
     public record HorizontalRule;
 
     // represent ColWidth as a double?
