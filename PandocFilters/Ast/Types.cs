@@ -202,7 +202,7 @@ namespace PandocFilters.Ast {
         public static implicit operator Inline(Note note) => new Inline(note);
         public static implicit operator Inline(Span span) => new Inline(span);
 
-        public override string ToString() => Value.ToString();
+        public override string? ToString() => Value?.ToString();
     }
 
     public record Str(string Text) {
@@ -274,7 +274,7 @@ namespace PandocFilters.Ast {
 
     public record RawInline(string Format, string Text);
 
-    public record Link(Attr Attr, ImmutableList<Inline> AltText, (string Url, string Title) Target) {
+    public record Link(Attr Attr, ImmutableList<Inline> Text, (string Url, string Title) Target) {
         public override string ToString() => WriteTarget(Target);
     };
 
