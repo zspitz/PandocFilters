@@ -158,7 +158,7 @@ namespace PandocFilters.Ast {
         Note,
         Span
     > {
-        private Inline(OneOf<
+        public Inline(OneOf<
             Str,
             Emph,
             Underline,
@@ -312,7 +312,9 @@ namespace PandocFilters.Ast {
     // replace Format with string
 
     // <summary>Attributes: identifier, classes, key-value pairs</summary>
-    public record Attr(string Identifier, ImmutableList<string> Classes, ImmutableList<(string, string)> KeyValuePairs);
+    public record Attr(string Identifier, ImmutableList<string> Classes, ImmutableList<(string, string)> KeyValuePairs) {
+        public static Attr Empty = new Attr("", ImmutableList<string>.Empty, ImmutableList<(string, string)>.Empty);
+    };
 
     /// <summary>The caption of a table, with an optional short caption.</summary>
     /// <param name="ShortCaption">A short caption, for use in, for instance, lists of figures.</param>
