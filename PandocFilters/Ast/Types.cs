@@ -5,6 +5,7 @@ using Newtonsoft.Json.Serialization;
 using OneOf;
 using ZSpitz.Util;
 using static PandocFilters.Functions;
+using System.Linq;
 
 namespace PandocFilters.Ast {
 
@@ -101,7 +102,9 @@ namespace PandocFilters.Ast {
     }
 
     /// <summary>Multiple non-breaking lines</summary>
-    public record LineBlock(ImmutableList<ImmutableList<Inline>> NestedInlines);
+    public record LineBlock(ImmutableList<ImmutableList<Inline>> NestedInlines) {
+        public override string ToString() => NestedInlines.Select(x => x.Joined("")).Joined("\n");
+    }
 
     /// <summary>Code block (literal) with attributes</summary>
     public record CodeBlock(Attr Attr, string Code) {
