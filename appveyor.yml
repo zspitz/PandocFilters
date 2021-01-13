@@ -5,7 +5,7 @@ init:
   - git config --global core.autocrlf false
 branches:
   only:
-    - master
+    - main
 skip_tags:  true
 only_commits:
   files:
