@@ -103,6 +103,8 @@ visitor.Add((Image image) => image with {
 Filter.Run(visitor);
 ```
 
+For a real-world usage example with multiple visitors (and the reason I wrote this in the first place), see [DlrDocsProcessor](https://github.com/zspitz/DlrDocsProcessor).
+
 ## Credits
 
 * John McFarlane and contributors for Pandoc

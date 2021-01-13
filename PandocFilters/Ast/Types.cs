@@ -313,7 +313,7 @@ namespace PandocFilters.Ast {
 
     // <summary>Attributes: identifier, classes, key-value pairs</summary>
     public record Attr(string Identifier, ImmutableList<string> Classes, ImmutableList<(string, string)> KeyValuePairs) {
-        public static Attr Empty = new Attr("", ImmutableList<string>.Empty, ImmutableList<(string, string)>.Empty);
+        public static readonly Attr Empty = new Attr("", ImmutableList<string>.Empty, ImmutableList<(string, string)>.Empty);
     };
 
     /// <summary>The caption of a table, with an optional short caption.</summary>
