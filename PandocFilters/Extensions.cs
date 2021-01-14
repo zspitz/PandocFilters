@@ -10,7 +10,7 @@ namespace PandocFilters {
 
         public static IEnumerable<Inline> ToInlines(this string s) {
             var firstWord = true;
-            foreach (var word in s.Split(' ')) {
+            foreach (var word in s.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)) {
                 if (firstWord) {
                     firstWord = false;
                 } else {
