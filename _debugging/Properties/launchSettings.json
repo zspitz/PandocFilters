@@ -3,7 +3,7 @@
     "_debugging": {
       "commandName": "Executable",
       "executablePath": "C:\\Program Files\\Pandoc\\pandoc.exe",
-      "commandLineArgs": "\"C:\\Users\\Spitz\\source\\repos\\PandocFilters\\Tests\\files2\\metadata.md\" -t native --filter _debugging.exe -f markdown_github+yaml_metadata_block"
+      "commandLineArgs": "\"C:\\Users\\Spitz\\source\\repos\\PandocFilters\\Tests\\files2\\metadata.md\" --filter _debugging.exe -f markdown_github+yaml_metadata_block -t json"
     }
   }
 }

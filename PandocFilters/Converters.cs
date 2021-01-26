@@ -10,6 +10,8 @@ using System.Reflection;
 using ZSpitz.Util;
 using static ZSpitz.Util.Functions;
 using static PandocFilters.Functions;
+using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace PandocFilters {
     public class OneOfJsonConverter : JsonConverter {
@@ -106,18 +108,28 @@ namespace PandocFilters {
     }
 
     public class PandocTypesConverter : JsonConverter {
+        private static readonly string[] metaNames = new [] {
+            "MetaMap",
+            "MetaList",
+            "MetaBool",
+            "MetaString",
+            "MetaInlines",
+            "MetaBlocks"
+        };
+
         // nameof only returns the last segment of the fully-qualified name - https://stackoverflow.com/a/38584443/111794
-        private static readonly Dictionary<string, ConstructorInfo?> handledTypes =
+        private static readonly Dictionary<string, ConstructorInfo?> handledTypes = 
             typeof(Pandoc).Assembly.GetTypes()
                 .Where(x => x.Namespace == $"{nameof(PandocFilters)}.{nameof(Ast)}" && !(
                     x == typeof(Pandoc) ||
-                    x == typeof(MetaValue)
+                    x == typeof(MetaValue) ||
+                    x.HasAttribute<CompilerGeneratedAttribute>()
                 ))
                 .Select(x => (
                     x.Name,
                     x.IsEnum ? null : x.GetConstructors().SingleOrDefault()
                 ))
-                .ToDictionary()!; // SingleOrDefault should be typed as ConstructorInfo? but returns ConstructorInfo
+                .ToDictionary()!;
 
         private static readonly HashSet<string> tupleRecordNames = new() {
             nameof(Attr),
@@ -134,14 +146,7 @@ namespace PandocFilters {
             if (value is null) { return; }
             var (isMetaValue, ctor) =
                 value is MetaValue mv ?
-                    (true, mv.Match(
-                        dict => "MetaMap",
-                        lst => "MetaList",
-                        b => "MetaBool",
-                        s => "MetaString",
-                        inlines => "MetaInlines",
-                        blocks => "MetaBlocks"
-                    )) :
+                    (true, metaNames[mv.Index]) :
                     (false, "");
             if (value is IOneOf oneOf) { value = oneOf.Value; }
 
@@ -205,41 +210,58 @@ namespace PandocFilters {
             ConstructorInfo? ctor;
             ParameterInfo[]? parameters;
             object[] args;
+
             switch (token.Type) {
                 case JTokenType.Object:
                     var t = (string?)token["t"];
                     var c = token["c"];
+
                     if (objectType.IsEnum && c is null) {
                         if (t is null) { throw new InvalidOperationException(); }
                         // Enum values come in with only the `t` property
                         return Enum.Parse(objectType, t);
                     }
 
-                    // Most of the time, the concrete type of the serialized token will be at the 't' property
-                    // Sometimes (e.g. Citation), the token is just a plain object, without a 't' property.
-                    // In that case, the constructor comes from the `objectType`.
-
-                    ctor = handledTypes[t ?? objectType.Name];
-                    if (ctor is null) { throw new InvalidOperationException(); }
-                    parameters = ctor.GetParameters();
-                    if (c is not null && parameters.Length == 0) {
-                        throw new InvalidOperationException();
-                    }
-
-                    if (parameters.Length == 0) {
-                        args = Array.Empty<object>();
-                    } else if (c is null) {
-                        // plain object, e.g. Citation -- read constructor parameters from object properties
-                        args = parameters.Select(prm => token[prm.Name.ToCamelCase()!]!.ToObject(prm.ParameterType, serializer)!).ToArray();
+                    // handle Meta* types here
+                    var metaIndex = Array.IndexOf(metaNames, t);
+                    if (metaIndex != -1) {
+                        ctor = typeof(MetaValue).GetConstructors().SingleOrDefault();
+                        var parameterType = ctor.GetParameters()[0].ParameterType;
+                        var metaTargetType = objectType.OneOfSubtypes()[metaIndex];
+                        args = new[] { 
+                            ConvertTo(
+                                c!.ToObject(metaTargetType, serializer),
+                                parameterType
+                            )!
+                        };
                     } else {
-                        args = (parameters.Length switch {
-                            // single JSON object
-                            1 => new[] { c!.ToObject(parameters[0].ParameterType, serializer)! },
+                        // Most of the time, the concrete type of the serialized token will be at the 't' property
+                        // Sometimes (e.g. Citation), the token is just a plain object, without a 't' property.
+                        // In that case, the constructor comes from the `objectType`.
 
-                            // JSON array
-                            _ => parameters.Zip(c!).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray()
-                        });
+                        ctor = handledTypes[t ?? objectType.Name];
+                        if (ctor is null) { throw new InvalidOperationException(); }
+                        parameters = ctor.GetParameters();
+                        if (c is not null && parameters.Length == 0) {
+                            throw new InvalidOperationException();
+                        }
+
+                        if (parameters.Length == 0) {
+                            args = Array.Empty<object>();
+                        } else if (c is null) {
+                            // plain object, e.g. Citation -- read constructor parameters from object properties
+                            args = parameters.Select(prm => token[prm.Name.ToCamelCase()!]!.ToObject(prm.ParameterType, serializer)!).ToArray();
+                        } else {
+                            args = (parameters.Length switch {
+                                // single JSON object
+                                1 => new[] { c!.ToObject(parameters[0].ParameterType, serializer)! },
+
+                                // JSON array
+                                _ => parameters.Zip(c!).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray()
+                            });
+                        }
                     }
+
                     var ret = ctor.Invoke(args);
                     ret = ConvertTo(ret, objectType);
                     return ret;
@@ -260,6 +282,6 @@ namespace PandocFilters {
             throw new NotImplementedException();
         }
 
-        public override bool CanConvert(Type objectType) => handledTypes.ContainsKey(objectType.Name);
+        public override bool CanConvert(Type objectType) => handledTypes.ContainsKey(objectType.Name) || objectType.Name == nameof(MetaValue);
     }
 }

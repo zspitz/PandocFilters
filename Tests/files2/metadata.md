@@ -1,6 +1,7 @@
 ﻿---
-sort: 5
+sort: "5"
+sort1: 5
 is: true
 ---
 
-This is a Markdown file with a metadata block
+Markdown with metadata.

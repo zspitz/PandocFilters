@@ -40,6 +40,15 @@ namespace PandocFilters.Ast {
         public static implicit operator MetaValue(string s) => new MetaValue(s);
         public static implicit operator MetaValue(ImmutableList<Inline> inlines) => new MetaValue(inlines);
         public static implicit operator MetaValue(ImmutableList<Block> blocks) => new MetaValue(blocks);
+
+        public override string ToString() => Match(
+            dict => dict.ToString(),
+            lst => lst.ToString(),
+            b => b.ToString(),
+            s => s,
+            lst => lst.Joined(""),
+            lst => lst.Joined("\n")
+        );
     }
 
     public class Block : OneOfBase<
