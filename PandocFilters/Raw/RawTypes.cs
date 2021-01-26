@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using OneOf;
 using Newtonsoft.Json;
-using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, double, PandocFilters.Raw.TagContent1, PandocFilters.Raw.Citation>;
+using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, double, bool, PandocFilters.Raw.TagContent1, PandocFilters.Raw.Citation>;
 using System.Collections.Immutable;
 
 namespace PandocFilters.Raw {

@@ -139,6 +139,7 @@ namespace PandocFilters.Ast {{
 
 static void GenerateDelegateVisitor() {
     throw new NotImplementedException("Generator doesn't output VisitListItem override.");
+
     var types = Assembly.GetAssembly(typeof(Pandoc))!.GetTypes()
         .Where(x =>
             x.Namespace == "PandocFilters.Ast" && !(

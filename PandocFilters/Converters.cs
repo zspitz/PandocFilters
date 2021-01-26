@@ -132,6 +132,17 @@ namespace PandocFilters {
 
         public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer) {
             if (value is null) { return; }
+            var (isMetaValue, ctor) =
+                value is MetaValue mv ?
+                    (true, mv.Match(
+                        dict => "MetaMap",
+                        lst => "MetaList",
+                        b => "MetaBool",
+                        s => "MetaString",
+                        inlines => "MetaInlines",
+                        blocks => "MetaBlocks"
+                    )) :
+                    (false, "");
             if (value is IOneOf oneOf) { value = oneOf.Value; }
 
             if (value is Citation citation) {
@@ -158,10 +169,16 @@ namespace PandocFilters {
             if (type.IsEnum) {
                 t = value.ToString();
             } else {
-                if (type.Name.NotIn(tupleRecordNames)) { t = type.Name; }
+                if (isMetaValue) {
+                    t = ctor;
+                } else if (type.Name.NotIn(tupleRecordNames)) { 
+                    t = type.Name; 
+                }
                 var deconstruct = type.GetMethod("Deconstruct");
                 object[] deconstructed;
-                if (deconstruct is null) {
+                if (isMetaValue) {
+                    deconstructed = new object[] { value };
+                } else if (deconstruct is null) {
                     deconstructed = Array.Empty<object>();
                 } else {
                     deconstructed = new object[deconstruct.GetParameters().Length];

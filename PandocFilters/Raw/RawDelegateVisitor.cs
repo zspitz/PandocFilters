@@ -1,5 +1,5 @@
 ﻿using System;
-using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, double, PandocFilters.Raw.TagContent1, PandocFilters.Raw.Citation>;
+using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, double, bool, PandocFilters.Raw.TagContent1, PandocFilters.Raw.Citation>;
 using static PandocFilters.Functions;
 
 namespace PandocFilters.Raw {

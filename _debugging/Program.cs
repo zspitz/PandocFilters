@@ -5,7 +5,7 @@ using System.Diagnostics;
 
 Debugger.Launch();
 
-Filter.Run(new TestRawVisitor());
+Filter.Run(new TestVisitor());
 
 class TestVisitor : VisitorBase { }
 

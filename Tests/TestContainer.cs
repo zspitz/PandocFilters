@@ -15,6 +15,7 @@ using Newtonsoft.Json.Linq;
 namespace Tests {
     public class TestContainer {
         private static readonly string filesRoot = GetFullFilename(@"..\..\..\files");
+        private static readonly string files2Root = GetFullFilename(@"..\..\..\files2");
         private static readonly string filtersRoot = GetFullFilename(@"..\..\..\..\TestFilters");
         private static readonly Dictionary<string, OneOf<bool, string>> formatMap = new Dictionary<string, OneOf<bool, string>>() {
             [""] = false,
@@ -78,7 +79,8 @@ namespace Tests {
             [".xwiki"] = false,
             [".zimwiki"] = false,
 
-            ["jats-reader.xml"] = "jats"
+            ["jats-reader.xml"] = "jats",
+            ["metadata.md"] = "markdown_github+yaml_metadata_block"
         };
 
         private static readonly string config =
@@ -89,13 +91,17 @@ namespace Tests {
 #endif
 
         private static readonly Dictionary<string, OneOf<bool, string>> fileFormatMapping =
-            EnumerateFiles(filesRoot, "*.*", SearchOption.AllDirectories)
-                .Select(x => {
-                    var (path, ext) = (x.Replace(filesRoot, ""), GetExtension(x));
-                    if (!formatMap.TryGetValue(ext, out var mapping)) {
+            new[] { filesRoot, files2Root }
+                .SelectMany(dir => EnumerateFiles(dir, "*.*", SearchOption.AllDirectories).Select(file => (dir, file)))
+                .SelectT((dir, x) => {
+                    var (filename, ext) = (GetFileName(x), GetExtension(x));
+                    if (
+                        !formatMap.TryGetValue(filename,out var mapping) &&
+                        !formatMap.TryGetValue(ext, out mapping)
+                    ) {
                         mapping = formatMap.Keys.FirstOrDefault(y => x.EndsWith(y));
                     }
-                    return (path, mapping);
+                    return (x, mapping);
                 })
                 .ToDictionary();
 
@@ -116,7 +122,6 @@ namespace Tests {
                     s => !s.IsNullOrWhitespace()
                 ))
                 .SelectKVP((path, v) => {
-                    var fullPath = $"{filesRoot}\\{path}";
                     var format = v.Match(
                         b => "",
                         s => s
@@ -124,8 +129,8 @@ namespace Tests {
                     return (
                         path,
                         (
-                            Lazy(() => GetAst(fullPath, "", format)),
-                            Lazy(() => GetJson(fullPath, format))
+                            Lazy(() => GetAst(path, "", format)),
+                            Lazy(() => GetJson(path, format))
                         )
                     );
                 })
@@ -136,12 +141,16 @@ namespace Tests {
             return generators.Keys.SelectMany(doc => filters.Select(filter => (doc, filter)));
         }).ToTheoryData();
 
+        private bool ignoreWarning(ProcessResult result) => result.StdErr == "[WARNING] Deprecated: markdown_github. Use gfm instead.";
+
         [MemberData(nameof(TestData))]
         [SkippableTheory]
         public void AstTest(string docPath, string filterName) {
             var astResult = generators[docPath].ast.Value;
             Skip.If(
-                astResult.ExitCode != 0 || astResult.StdOut.IsNullOrEmpty() || !astResult.StdErr.IsNullOrEmpty(),
+                astResult.ExitCode != 0 || 
+                astResult.StdOut.IsNullOrEmpty() || 
+                !(astResult.StdErr.IsNullOrEmpty() || ignoreWarning(astResult)),
                 $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
             );
 
@@ -153,10 +162,11 @@ namespace Tests {
                     ) :
                     "";
 
-            docPath = $"{filesRoot}\\{docPath}";
             var filterPath = $@"{filtersRoot}\{filterName}\bin\{config}\net5.0\{filterName}.exe";
             var result = GetAst(docPath, filterPath, format);
-            Assert.Equal("", result.StdErr);
+            Assert.True(
+                result.StdErr.IsNullOrWhitespace() || ignoreWarning(result)
+            );
             Assert.Equal(0, result.ExitCode);
             Assert.Equal(astResult.StdOut, result.StdOut);
         }
@@ -166,7 +176,9 @@ namespace Tests {
         public void JsonTest(string docPath, string filterName) {
             var jsonResult = generators[docPath].json.Value;
             Skip.If(
-                jsonResult.ExitCode != 0 || jsonResult.StdOut.IsNullOrEmpty() || !jsonResult.StdErr.IsNullOrEmpty(),
+                jsonResult.ExitCode != 0 || 
+                jsonResult.StdOut.IsNullOrEmpty() || 
+                !(jsonResult.StdErr.IsNullOrEmpty() || ignoreWarning(jsonResult)),
                 $"{(!jsonResult.StdErr.IsNullOrEmpty() ? jsonResult.StdErr : "")} - {(jsonResult.ExitCode != 0 ? jsonResult.ExitCode.ToString() : "")}"
             );
 
@@ -182,7 +194,9 @@ namespace Tests {
                 EnableRaisingEvents = true
             };
             var result = RunProcess(process, jsonResult.StdOut);
-            Assert.Equal("", result.StdErr);
+            Assert.True(
+                result.StdErr.IsNullOrWhitespace() || ignoreWarning(result)
+            );
             Assert.Equal(0, result.ExitCode);
             Assert.True(
                 JToken.DeepEquals(

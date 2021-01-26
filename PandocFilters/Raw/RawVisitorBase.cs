@@ -1,7 +1,7 @@
 ﻿using OneOf;
 using System.Collections.Immutable;
 using System.Linq;
-using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, double, PandocFilters.Raw.TagContent1, PandocFilters.Raw.Citation>;
+using DataValue = OneOf.OneOf<PandocFilters.Raw.TagContent?, string, long, double, bool, PandocFilters.Raw.TagContent1, PandocFilters.Raw.Citation>;
 using ZSpitz.Util;
 using static ZSpitz.Util.Functions;
 
@@ -13,7 +13,7 @@ namespace PandocFilters.Raw {
                 Blocks = rawPandoc.Blocks.Select(VisitTagContent).ToImmutableList()!
             };
 
-        public virtual TagContent? VisitTagContent(TagContent? tagContent) => 
+        public virtual TagContent? VisitTagContent(TagContent? tagContent) =>
             tagContent is null
                 ? null
                 : (tagContent with
@@ -30,6 +30,7 @@ namespace PandocFilters.Raw {
                 s => s,
                 l => l,
                 d => d,
+                b => b,
                 tagContent1 => {
                     var ret = new TagContent1();
                     tagContent1?.Select(VisitDataValue).AddRangeTo(ret);
