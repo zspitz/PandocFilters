@@ -30,8 +30,6 @@ build:
 matrix:
   fast_finish: true
 
-test: off
-
 before_test:
 - cmd: choco install pandoc
 
