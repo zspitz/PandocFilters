@@ -33,7 +33,7 @@ namespace PandocFilters {
             string? s;
             while (true) {
                 s = Console.ReadLine();
-                if (s is null) { break; }
+                if (s.IsNullOrWhitespace()) { break; }
 
                 if (visitors.None()) {
                     Console.WriteLine(s);
