@@ -42,8 +42,11 @@ namespace PandocFilters.Ast {
         public static implicit operator MetaValue(ImmutableList<Block> blocks) => new MetaValue(blocks);
 
         public override string ToString() => Match(
-            dict => dict.ToString(),
-            lst => lst.ToString(),
+            dict => $@"{{
+    {dict.Joined(@",
+", kvp => $"{kvp.Key}: {kvp.Value}")}
+}}",
+            lst => lst.Joined(),
             b => b.ToString(),
             s => s,
             lst => lst.Joined(""),
@@ -98,6 +101,8 @@ namespace PandocFilters.Ast {
         public static implicit operator Block(Table table) => new Block(table);
         public static implicit operator Block(Div div) => new Block(div);
         public static implicit operator Block(Null @null) => new Block(@null);
+
+        public override string ToString() => Value.ToString();
     }
 
     /// <summary>Plain text, not a paragraph</summary>

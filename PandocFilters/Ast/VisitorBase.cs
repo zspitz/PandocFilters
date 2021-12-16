@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Linq;
 using ZSpitz.Util;
 using static ZSpitz.Util.Functions;
@@ -7,8 +6,7 @@ using static ZSpitz.Util.Functions;
 namespace PandocFilters.Ast {
     public abstract class VisitorBase : IVisitor<Pandoc> {
         public virtual Pandoc VisitPandoc(Pandoc pandoc) =>
-            pandoc with
-            {
+            pandoc with {
                 Blocks = pandoc.Blocks.Select(VisitBlock).ToImmutableList()
             };
 
