@@ -98,7 +98,7 @@ namespace PandocFilters {
 
             var isValueTuple = underlying.Name.StartsWith("ValueTuple");
             var types = underlying.GetGenericArguments();
-            var objects = types.Zip(token)
+            var objects = types.ZipT(token)
                 .SelectT((type, token) => token.ToObject(type, serializer))
                 .ToArray();
             return MakeTuple(isValueTuple, objects, types);
@@ -225,7 +225,7 @@ namespace PandocFilters {
                     // handle Meta* types here
                     var metaIndex = Array.IndexOf(metaNames, t);
                     if (metaIndex != -1) {
-                        ctor = typeof(MetaValue).GetConstructors().SingleOrDefault();
+                        ctor = typeof(MetaValue).GetConstructors().Single();
                         var parameterType = ctor.GetParameters()[0].ParameterType;
                         var metaTargetType = objectType.OneOfSubtypes()[metaIndex];
                         args = new[] { 
@@ -257,7 +257,7 @@ namespace PandocFilters {
                                 1 => new[] { c!.ToObject(parameters[0].ParameterType, serializer)! },
 
                                 // JSON array
-                                _ => parameters.Zip(c!).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray()
+                                _ => parameters.ZipT(c!).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray()
                             });
                         }
                     }
@@ -273,7 +273,7 @@ namespace PandocFilters {
                     if (parameters.Length != token.Count()) {
                         throw new InvalidOperationException();
                     }
-                    args = parameters.Zip(token).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray();
+                    args = parameters.ZipT(token).SelectT((prm, token) => token.ToObject(prm.ParameterType, serializer)!).ToArray();
                     return ctor.Invoke(args);
                 default:
                     throw new InvalidOperationException($"Unhandled token type '{token.Type}'.");

@@ -1,5 +1,5 @@
 version: 0.3.{build}
-image: Visual Studio 2019
+image: Visual Studio 2022
 configuration: Release
 init:
   - git config --global core.autocrlf false
@@ -42,5 +42,5 @@ artifacts:
 deploy:
   - provider: NuGet
     api_key:
-      secure: cQKfyN4nusafedPIczoq8LqbW5wSCTTXG8CbcrwQcaglRj2zq9aRSaQX5KM+VEKd
+      secure: zx85vOF0s9eyYOVwT/6GJKE85T8SoWzZjbN8DyUtJ8pvOtiYz/XO94EmCaDgQCki
     artifact: /.*(\.|\.s)nupkg/

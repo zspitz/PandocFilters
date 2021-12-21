@@ -102,7 +102,7 @@ namespace PandocFilters.Ast {
         public static implicit operator Block(Div div) => new Block(div);
         public static implicit operator Block(Null @null) => new Block(@null);
 
-        public override string ToString() => Value.ToString();
+        public override string? ToString() => Value.ToString();
     }
 
     /// <summary>Plain text, not a paragraph</summary>

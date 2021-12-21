@@ -10,8 +10,7 @@ namespace _testNetFx {
     }
 
     class TestVisitor : VisitorBase {
-        public override Image VisitImage(Image image) {
-            return new Image(image.Attr, image.Inlines, image.Target);
-        }
+        public override Image VisitImage(Image image) =>
+            new(image.Attr, image.AltText, image.Target);
     }
 }

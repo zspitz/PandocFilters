@@ -17,7 +17,7 @@ namespace Tests {
             if (!outputFormat.IsNullOrWhitespace()) { args += $" --to {outputFormat}"; }
             if (!filter.IsNullOrWhitespace()) { args += $" --filter {filter}"; }
 
-            return new Process {
+            return new() {
                 StartInfo = {
                     FileName = pandocPath,
                     Arguments = args,
@@ -33,7 +33,6 @@ namespace Tests {
         public static ProcessResult GetAst(string docPath, string filter = "", string inputFormat = "") {
             using var process = getProcess(docPath, filter, "native", inputFormat);
             return RunProcess(process);
-            
         }
 
         public static ProcessResult GetJson(string docPath, string inputFormat = "") {
@@ -53,11 +52,17 @@ namespace Tests {
 
         public static string GetFullFilename(string relativePath) {
             var codeBase = Assembly.GetExecutingAssembly().Location;
-            if (codeBase == null) { throw new InvalidOperationException(); }
-            var executable = new Uri(codeBase).LocalPath;
-            return Path.GetFullPath(Path.Combine(Path.GetDirectoryName(executable)!, relativePath));
+            string folder;
+            if (codeBase.Contains("AppData\\Local\\Temp", StringComparison.InvariantCultureIgnoreCase)) {
+                folder = Directory.GetCurrentDirectory();
+            } else {
+                if (codeBase == null) { throw new InvalidOperationException(); }
+                var executable = new Uri(codeBase).LocalPath;
+                folder = Path.GetDirectoryName(executable)!;
+            }
+            return Path.GetFullPath(Path.Combine(folder, relativePath));
         }
 
-        public static Lazy<T> Lazy<T>(Func<T> valueFactory) => new Lazy<T>(valueFactory);
+        public static Lazy<T> Lazy<T>(Func<T> valueFactory) => new(valueFactory);
     }
 }

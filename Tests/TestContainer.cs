@@ -17,7 +17,7 @@ namespace Tests {
         private static readonly string filesRoot = GetFullFilename(@"..\..\..\files");
         private static readonly string files2Root = GetFullFilename(@"..\..\..\files2");
         private static readonly string filtersRoot = GetFullFilename(@"..\..\..\..\TestFilters");
-        private static readonly Dictionary<string, OneOf<bool, string>> formatMap = new Dictionary<string, OneOf<bool, string>>() {
+        private static readonly Dictionary<string, OneOf<bool, string>> formatMap = new() {
             [""] = false,
             [".asciidoc"] = false,
             [".asciidoctor"] = false,
@@ -149,9 +149,9 @@ namespace Tests {
             var astResult = generators[docPath].ast.Value;
             Skip.If(
                 astResult.ExitCode != 0 || 
-                astResult.StdOut.IsNullOrEmpty() || 
-                !(astResult.StdErr.IsNullOrEmpty() || ignoreWarning(astResult)),
-                $"{(!astResult.StdErr.IsNullOrEmpty() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
+                astResult.StdOut.IsNullOrWhitespace() || 
+                !(astResult.StdErr.IsNullOrWhitespace() || ignoreWarning(astResult)),
+                $"{(!astResult.StdErr.IsNullOrWhitespace() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
             );
 
             var format =
@@ -177,9 +177,9 @@ namespace Tests {
             var jsonResult = generators[docPath].json.Value;
             Skip.If(
                 jsonResult.ExitCode != 0 || 
-                jsonResult.StdOut.IsNullOrEmpty() || 
-                !(jsonResult.StdErr.IsNullOrEmpty() || ignoreWarning(jsonResult)),
-                $"{(!jsonResult.StdErr.IsNullOrEmpty() ? jsonResult.StdErr : "")} - {(jsonResult.ExitCode != 0 ? jsonResult.ExitCode.ToString() : "")}"
+                jsonResult.StdOut.IsNullOrWhitespace() || 
+                !(jsonResult.StdErr.IsNullOrWhitespace() || ignoreWarning(jsonResult)),
+                $"{(!jsonResult.StdErr.IsNullOrWhitespace() ? jsonResult.StdErr : "")} - {(jsonResult.ExitCode != 0 ? jsonResult.ExitCode.ToString() : "")}"
             );
 
             var process = new Process {
