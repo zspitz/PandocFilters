@@ -34,12 +34,12 @@ namespace PandocFilters.Ast {
             ImmutableList<Block>
         > value) : base(value) { }
 
-        public static implicit operator MetaValue(ImmutableDictionary<string,MetaValue> dict) => new MetaValue(dict);
-        public static implicit operator MetaValue(ImmutableList<MetaValue> lst) => new MetaValue(lst);
-        public static implicit operator MetaValue(bool b) => new MetaValue(b);
-        public static implicit operator MetaValue(string s) => new MetaValue(s);
-        public static implicit operator MetaValue(ImmutableList<Inline> inlines) => new MetaValue(inlines);
-        public static implicit operator MetaValue(ImmutableList<Block> blocks) => new MetaValue(blocks);
+        public static implicit operator MetaValue(ImmutableDictionary<string,MetaValue> dict) => new(dict);
+        public static implicit operator MetaValue(ImmutableList<MetaValue> lst) => new(lst);
+        public static implicit operator MetaValue(bool b) => new(b);
+        public static implicit operator MetaValue(string s) => new(s);
+        public static implicit operator MetaValue(ImmutableList<Inline> inlines) => new(inlines);
+        public static implicit operator MetaValue(ImmutableList<Block> blocks) => new(blocks);
 
         public override string ToString() => Match(
             dict => $@"{{
@@ -87,20 +87,20 @@ namespace PandocFilters.Ast {
             Null
         > value) : base(value) { }
 
-        public static implicit operator Block(Plain plain) => new Block(plain);
-        public static implicit operator Block(Para para) => new Block(para);
-        public static implicit operator Block(LineBlock lineblock) => new Block(lineblock);
-        public static implicit operator Block(CodeBlock codeblock) => new Block(codeblock);
-        public static implicit operator Block(RawBlock rawblock) => new Block(rawblock);
-        public static implicit operator Block(BlockQuote blockquote) => new Block(blockquote);
-        public static implicit operator Block(OrderedList orderedlist) => new Block(orderedlist);
-        public static implicit operator Block(BulletList bulletlist) => new Block(bulletlist);
-        public static implicit operator Block(DefinitionList definitionlist) => new Block(definitionlist);
-        public static implicit operator Block(Header header) => new Block(header);
-        public static implicit operator Block(HorizontalRule horizontalrule) => new Block(horizontalrule);
-        public static implicit operator Block(Table table) => new Block(table);
-        public static implicit operator Block(Div div) => new Block(div);
-        public static implicit operator Block(Null @null) => new Block(@null);
+        public static implicit operator Block(Plain plain) => new(plain);
+        public static implicit operator Block(Para para) => new(para);
+        public static implicit operator Block(LineBlock lineblock) => new(lineblock);
+        public static implicit operator Block(CodeBlock codeblock) => new(codeblock);
+        public static implicit operator Block(RawBlock rawblock) => new(rawblock);
+        public static implicit operator Block(BlockQuote blockquote) => new(blockquote);
+        public static implicit operator Block(OrderedList orderedlist) => new(orderedlist);
+        public static implicit operator Block(BulletList bulletlist) => new(bulletlist);
+        public static implicit operator Block(DefinitionList definitionlist) => new(definitionlist);
+        public static implicit operator Block(Header header) => new(header);
+        public static implicit operator Block(HorizontalRule horizontalrule) => new(horizontalrule);
+        public static implicit operator Block(Table table) => new(table);
+        public static implicit operator Block(Div div) => new(div);
+        public static implicit operator Block(Null @null) => new(@null);
 
         public override string? ToString() => Value.ToString();
     }
@@ -198,26 +198,26 @@ namespace PandocFilters.Ast {
             Span
         > value) : base(value) { }
 
-        public static implicit operator Inline(Str str) => new Inline(str);
-        public static implicit operator Inline(Emph emph) => new Inline(emph);
-        public static implicit operator Inline(Underline underline) => new Inline(underline);
-        public static implicit operator Inline(Strong strong) => new Inline(strong);
-        public static implicit operator Inline(Strikeout strikeout) => new Inline(strikeout);
-        public static implicit operator Inline(Superscript superscript) => new Inline(superscript);
-        public static implicit operator Inline(Subscript subscript) => new Inline(subscript);
-        public static implicit operator Inline(SmallCaps smallCaps) => new Inline(smallCaps);
-        public static implicit operator Inline(Quoted quoted) => new Inline(quoted);
-        public static implicit operator Inline(Cite cite) => new Inline(cite);
-        public static implicit operator Inline(Code code) => new Inline(code);
-        public static implicit operator Inline(Space space) => new Inline(space);
-        public static implicit operator Inline(SoftBreak softBreak) => new Inline(softBreak);
-        public static implicit operator Inline(LineBreak lineBreak) => new Inline(lineBreak);
-        public static implicit operator Inline(Math math) => new Inline(math);
-        public static implicit operator Inline(RawInline rawInline) => new Inline(rawInline);
-        public static implicit operator Inline(Link link) => new Inline(link);
-        public static implicit operator Inline(Image image) => new Inline(image);
-        public static implicit operator Inline(Note note) => new Inline(note);
-        public static implicit operator Inline(Span span) => new Inline(span);
+        public static implicit operator Inline(Str str) => new(str);
+        public static implicit operator Inline(Emph emph) => new(emph);
+        public static implicit operator Inline(Underline underline) => new(underline);
+        public static implicit operator Inline(Strong strong) => new(strong);
+        public static implicit operator Inline(Strikeout strikeout) => new(strikeout);
+        public static implicit operator Inline(Superscript superscript) => new(superscript);
+        public static implicit operator Inline(Subscript subscript) => new(subscript);
+        public static implicit operator Inline(SmallCaps smallCaps) => new(smallCaps);
+        public static implicit operator Inline(Quoted quoted) => new(quoted);
+        public static implicit operator Inline(Cite cite) => new(cite);
+        public static implicit operator Inline(Code code) => new(code);
+        public static implicit operator Inline(Space space) => new(space);
+        public static implicit operator Inline(SoftBreak softBreak) => new(softBreak);
+        public static implicit operator Inline(LineBreak lineBreak) => new(lineBreak);
+        public static implicit operator Inline(Math math) => new(math);
+        public static implicit operator Inline(RawInline rawInline) => new(rawInline);
+        public static implicit operator Inline(Link link) => new(link);
+        public static implicit operator Inline(Image image) => new(image);
+        public static implicit operator Inline(Note note) => new(note);
+        public static implicit operator Inline(Span span) => new(span);
 
         public override string? ToString() => Value?.ToString();
     }
@@ -330,7 +330,7 @@ namespace PandocFilters.Ast {
 
     // <summary>Attributes: identifier, classes, key-value pairs</summary>
     public record Attr(string Identifier, ImmutableList<string> Classes, ImmutableList<(string, string)> KeyValuePairs) {
-        public static readonly Attr Empty = new Attr("", ImmutableList<string>.Empty, ImmutableList<(string, string)>.Empty);
+        public static readonly Attr Empty = new("", ImmutableList<string>.Empty, ImmutableList<(string, string)>.Empty);
     };
 
     /// <summary>The caption of a table, with an optional short caption.</summary>
@@ -351,8 +351,8 @@ namespace PandocFilters.Ast {
     /// <summary>The width of a table column, as a fraction of the total table width.</summary>
     public class ColWidthBase : OneOfBase<ColWidth, ColWidthDefault> {
         private ColWidthBase(OneOf<ColWidth, ColWidthDefault> value) : base(value) { }
-        public static implicit operator ColWidthBase(ColWidth value) => new ColWidthBase(value);
-        public static implicit operator ColWidthBase(ColWidthDefault colWidthDefault) => new ColWidthBase(colWidthDefault);
+        public static implicit operator ColWidthBase(ColWidth value) => new(value);
+        public static implicit operator ColWidthBase(ColWidthDefault colWidthDefault) => new(colWidthDefault);
     }
 
     /// <summary>The width of a table column, as a fraction of the total table width.</summary>

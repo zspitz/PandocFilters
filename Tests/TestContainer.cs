@@ -99,7 +99,7 @@ namespace Tests {
                         !formatMap.TryGetValue(filename,out var mapping) &&
                         !formatMap.TryGetValue(ext, out mapping)
                     ) {
-                        mapping = formatMap.Keys.FirstOrDefault(y => x.EndsWith(y));
+                        mapping = formatMap.Keys.FirstOrDefault(y => x.EndsWith(y))!;
                     }
                     return (x, mapping);
                 })

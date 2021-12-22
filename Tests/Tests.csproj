@@ -1,7 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup Condition="'$(CI)' == 'true'">
+        <TargetFramework>net6.0</TargetFramework>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(CI)' != 'true'">
+        <TargetFrameworks>netcoreapp3.1;net6.0;net5.0;net472</TargetFrameworks>
+    </PropertyGroup>
+    
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.1;net6.0</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
