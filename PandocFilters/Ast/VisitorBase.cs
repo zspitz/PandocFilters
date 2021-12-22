@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using System;
+using System.Collections.Immutable;
 using System.Linq;
 using ZSpitz.Util;
 using static ZSpitz.Util.Functions;
@@ -107,7 +108,7 @@ namespace PandocFilters.Ast {
                 Blocks = div.Blocks.Select(VisitBlock).ToImmutableList()
             };
 
-        public virtual Null VisitNull(Null @null) => @null;
+        [Obsolete("https://github.com/jgm/pandoc-types/issues/91")] public virtual Null VisitNull(Null @null) => @null;
 
         public virtual Inline VisitInline(Inline inline) =>
             inline.Match<Inline>(

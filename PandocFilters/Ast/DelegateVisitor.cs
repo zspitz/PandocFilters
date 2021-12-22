@@ -73,7 +73,7 @@ namespace PandocFilters.Ast {
         public void Add(Func<HorizontalRule, HorizontalRule> del) => AddDelegate(ref horizontalRuleDelegate, del);
         public void Add(Func<Table, Table> del) => AddDelegate(ref tableDelegate, del);
         public void Add(Func<Div, Div> del) => AddDelegate(ref divDelegate, del);
-        public void Add(Func<Null, Null> del) => AddDelegate(ref @nullDelegate, del);
+        [Obsolete("https://github.com/jgm/pandoc-types/issues/91")] public void Add(Func<Null, Null> del) => AddDelegate(ref @nullDelegate, del);
         public void Add(Func<Inline, Inline> del) => AddDelegate(ref inlineDelegate, del);
         public void Add(Func<Str, Str> del) => AddDelegate(ref strDelegate, del);
         public void Add(Func<Emph, Emph> del) => AddDelegate(ref emphDelegate, del);
@@ -177,7 +177,7 @@ namespace PandocFilters.Ast {
             div = divDelegate?.Invoke(div) ?? div;
             return base.VisitDiv(div);
         }
-        public override Null VisitNull(Null @null) {
+        [Obsolete("https://github.com/jgm/pandoc-types/issues/91")] public override Null VisitNull(Null @null) {
             @null = @nullDelegate?.Invoke(@null) ?? @null;
             return base.VisitNull(@null);
         }
