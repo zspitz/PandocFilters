@@ -11,7 +11,6 @@ using ZSpitz.Util;
 using static ZSpitz.Util.Functions;
 using static PandocFilters.Functions;
 using System.Runtime.CompilerServices;
-using System.Diagnostics;
 
 namespace PandocFilters {
     public class OneOfJsonConverter : JsonConverter {
@@ -118,7 +117,8 @@ namespace PandocFilters {
         };
 
         // nameof only returns the last segment of the fully-qualified name - https://stackoverflow.com/a/38584443/111794
-        private static readonly Dictionary<string, ConstructorInfo?> handledTypes = 
+        private static readonly Dictionary<string, ConstructorInfo?> handledTypes =
+            IEnumerableTupleExtensions.ToDictionary(
             typeof(Pandoc).Assembly.GetTypes()
                 .Where(x => x.Namespace == $"{nameof(PandocFilters)}.{nameof(Ast)}" && !(
                     x == typeof(Pandoc) ||
@@ -129,7 +129,7 @@ namespace PandocFilters {
                     x.Name,
                     x.IsEnum ? null : x.GetConstructors().SingleOrDefault()
                 ))
-                .ToDictionary()!;
+            );
 
         private static readonly HashSet<string> tupleRecordNames = new() {
             nameof(Attr),

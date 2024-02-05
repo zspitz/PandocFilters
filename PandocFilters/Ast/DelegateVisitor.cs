@@ -21,7 +21,6 @@ namespace PandocFilters.Ast {
         private Func<HorizontalRule, HorizontalRule>? horizontalRuleDelegate;
         private Func<Table, Table>? tableDelegate;
         private Func<Div, Div>? divDelegate;
-        private Func<Null, Null>? @nullDelegate;
         private Func<Inline, Inline>? inlineDelegate;
         private Func<Str, Str>? strDelegate;
         private Func<Emph, Emph>? emphDelegate;
@@ -73,7 +72,6 @@ namespace PandocFilters.Ast {
         public void Add(Func<HorizontalRule, HorizontalRule> del) => AddDelegate(ref horizontalRuleDelegate, del);
         public void Add(Func<Table, Table> del) => AddDelegate(ref tableDelegate, del);
         public void Add(Func<Div, Div> del) => AddDelegate(ref divDelegate, del);
-        [Obsolete("https://github.com/jgm/pandoc-types/issues/91")] public void Add(Func<Null, Null> del) => AddDelegate(ref @nullDelegate, del);
         public void Add(Func<Inline, Inline> del) => AddDelegate(ref inlineDelegate, del);
         public void Add(Func<Str, Str> del) => AddDelegate(ref strDelegate, del);
         public void Add(Func<Emph, Emph> del) => AddDelegate(ref emphDelegate, del);
@@ -176,10 +174,6 @@ namespace PandocFilters.Ast {
         public override Div VisitDiv(Div div) {
             div = divDelegate?.Invoke(div) ?? div;
             return base.VisitDiv(div);
-        }
-        [Obsolete("https://github.com/jgm/pandoc-types/issues/91")] public override Null VisitNull(Null @null) {
-            @null = @nullDelegate?.Invoke(@null) ?? @null;
-            return base.VisitNull(@null);
         }
         public override Inline VisitInline(Inline inline) {
             inline = inlineDelegate?.Invoke(inline) ?? inline;

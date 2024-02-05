@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.0;net5.0</TargetFrameworks>
-		<LangVersion>10.0</LangVersion>
+		<TargetFrameworks>netstandard2.0;net5.0;net8.0</TargetFrameworks>
+		<LangVersion>11.0</LangVersion>
 		<Nullable>enable</Nullable>
 
 		<PackageId>PandocFilters</PackageId>
@@ -32,13 +32,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="OneOf" Version="3.0.205" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="OneOf.Extended" Version="3.0.205" />
-		<PackageReference Include="System.Collections.Immutable" Version="6.0.0" />
-		<PackageReference Include="ZSpitz.Util" Version="0.1.116" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1" PrivateAssets="All" />
+		<PackageReference Include="OneOf" Version="3.0.263" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="OneOf.Extended" Version="3.0.263" />
+		<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
+		<PackageReference Include="ZSpitz.Util" Version="0.1.125" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
 
-		<None Include="..\readme.md" Pack="true" PackagePath="\"/>
+		<None Include="..\readme.md" Pack="true" PackagePath="\" />
 	</ItemGroup>
 </Project>

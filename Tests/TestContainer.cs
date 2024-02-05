@@ -91,19 +91,21 @@ namespace Tests {
 #endif
 
         private static readonly Dictionary<string, OneOf<bool, string>> fileFormatMapping =
+            // TODO upgrade ZSpitz.Util dependency, which doesn't have an ambiguous ToDictionary in .NET 8
+            IEnumerableTupleExtensions.ToDictionary(
             new[] { filesRoot, files2Root }
                 .SelectMany(dir => EnumerateFiles(dir, "*.*", SearchOption.AllDirectories).Select(file => (dir, file)))
                 .SelectT((dir, x) => {
                     var (filename, ext) = (GetFileName(x), GetExtension(x));
                     if (
-                        !formatMap.TryGetValue(filename,out var mapping) &&
+                        !formatMap.TryGetValue(filename, out var mapping) &&
                         !formatMap.TryGetValue(ext, out mapping)
                     ) {
                         mapping = formatMap.Keys.FirstOrDefault(y => x.EndsWith(y))!;
                     }
                     return (x, mapping);
                 })
-                .ToDictionary();
+                );
 
         public static TheoryData<OneOf<bool, string>> FileFormatMappingData =
             fileFormatMapping
@@ -116,6 +118,7 @@ namespace Tests {
             Assert.True(mapping.IsT0 || mapping.AsT1 is not null);
 
         private static readonly Dictionary<string, (Lazy<ProcessResult> ast, Lazy<ProcessResult> json)> generators =
+            IEnumerableTupleExtensions.ToDictionary(
             fileFormatMapping
                 .WhereKVP((path, v) => v.Match(
                     b => b,
@@ -134,7 +137,7 @@ namespace Tests {
                         )
                     );
                 })
-                .ToDictionary();
+                );
 
         public static TheoryData<string, string> TestData = IIFE(() => {
             var filters = EnumerateDirectories(filtersRoot).Select(x => GetFileName(x)!);
@@ -148,8 +151,8 @@ namespace Tests {
         public void AstTest(string docPath, string filterName) {
             var astResult = generators[docPath].ast.Value;
             Skip.If(
-                astResult.ExitCode != 0 || 
-                astResult.StdOut.IsNullOrWhitespace() || 
+                astResult.ExitCode != 0 ||
+                astResult.StdOut.IsNullOrWhitespace() ||
                 !(astResult.StdErr.IsNullOrWhitespace() || ignoreWarning(astResult)),
                 $"{(!astResult.StdErr.IsNullOrWhitespace() ? astResult.StdErr : "")} - {(astResult.ExitCode != 0 ? astResult.ExitCode.ToString() : "")}"
             );
@@ -176,8 +179,8 @@ namespace Tests {
         public void JsonTest(string docPath, string filterName) {
             var jsonResult = generators[docPath].json.Value;
             Skip.If(
-                jsonResult.ExitCode != 0 || 
-                jsonResult.StdOut.IsNullOrWhitespace() || 
+                jsonResult.ExitCode != 0 ||
+                jsonResult.StdOut.IsNullOrWhitespace() ||
                 !(jsonResult.StdErr.IsNullOrWhitespace() || ignoreWarning(jsonResult)),
                 $"{(!jsonResult.StdErr.IsNullOrWhitespace() ? jsonResult.StdErr : "")} - {(jsonResult.ExitCode != 0 ? jsonResult.ExitCode.ToString() : "")}"
             );

@@ -35,8 +35,7 @@ namespace PandocFilters.Ast {
                 header => VisitHeader(header),
                 horizontalRule => VisitHorizontalRule(horizontalRule),
                 table => VisitTable(table),
-                div => VisitDiv(div),
-                @null => VisitNull(@null)
+                div => VisitDiv(div)
             );
 
         public virtual Plain VisitPlain(Plain plain) =>
@@ -107,8 +106,6 @@ namespace PandocFilters.Ast {
                 Attr = VisitAttr(div.Attr),
                 Blocks = div.Blocks.Select(VisitBlock).ToImmutableList()
             };
-
-        [Obsolete("https://github.com/jgm/pandoc-types/issues/91")] public virtual Null VisitNull(Null @null) => @null;
 
         public virtual Inline VisitInline(Inline inline) =>
             inline.Match<Inline>(

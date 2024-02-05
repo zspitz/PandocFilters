@@ -65,8 +65,7 @@ namespace PandocFilters.Ast {
         Header,
         HorizontalRule,
         Table,
-        Div,
-        Null
+        Div
     > {
         private Block(OneOf<
             Plain,
@@ -81,8 +80,7 @@ namespace PandocFilters.Ast {
             Header,
             HorizontalRule,
             Table,
-            Div,
-            Null
+            Div
         > value) : base(value) { }
 
         public static implicit operator Block(Plain plain) => new(plain);
@@ -98,7 +96,6 @@ namespace PandocFilters.Ast {
         public static implicit operator Block(HorizontalRule horizontalrule) => new(horizontalrule);
         public static implicit operator Block(Table table) => new(table);
         public static implicit operator Block(Div div) => new(div);
-        [Obsolete("https://github.com/jgm/pandoc-types/issues/91")] public static implicit operator Block(Null @null) => new(@null);
 
         public override string? ToString() => Value.ToString();
     }
@@ -148,9 +145,6 @@ namespace PandocFilters.Ast {
 
     /// <summary>Generic block container with attributes</summary>
     public record Div(Attr Attr, ImmutableList<Block> Blocks);
-
-    [Obsolete("https://github.com/jgm/pandoc-types/issues/91")]
-    public record Null;
 
     //public abstract record Inline;
     public class Inline : OneOfBase<
