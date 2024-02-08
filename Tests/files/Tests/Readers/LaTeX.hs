@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.LaTeX
-   Copyright   : © 2006-2020 John MacFarlane
+   Copyright   : © 2006-2023 John MacFarlane
    License     : GNU GPL, version 2 or above
 
    Maintainer  : John MacFarlane <jgm@berkeley.edu>
@@ -13,14 +12,10 @@ Tests for the LaTeX reader.
 -}
 module Tests.Readers.LaTeX (tests) where
 
-import Prelude
 import Data.Text (Text)
 import qualified Data.Text as T
-import qualified Text.Pandoc.UTF8 as UTF8
-import Text.Pandoc.Readers.LaTeX (tokenize, untokenize)
 import Test.Tasty
-import Test.Tasty.HUnit
-import Test.Tasty.QuickCheck
+import Test.Tasty.HUnit (HasCallStack)
 import Tests.Helpers
 import Text.Pandoc
 import Text.Pandoc.Arbitrary ()
@@ -31,7 +26,7 @@ latex = purely $ readLaTeX def{
                    readerExtensions = getDefaultExtensions "latex" }
 
 infix 4 =:
-(=:) :: ToString c
+(=:) :: (ToString c, HasCallStack)
      => String -> (Text, c) -> TestTree
 (=:) = test latex
 
@@ -49,21 +44,8 @@ simpleTable' aligns rows
   where
     toRow = Row nullAttr . map simpleCell
 
-tokUntokRt :: String -> Bool
-tokUntokRt s = untokenize (tokenize "random" t) == t
-  where t = T.pack s
-
 tests :: [TestTree]
-tests = [ testGroup "tokenization"
-          [ testCase "tokenizer round trip on test case" $ do
-                 orig <- T.pack <$> UTF8.readFile "../test/latex-reader.latex"
-                 let new = untokenize $ tokenize "../test/latex-reader.latex"
-                             orig
-                 assertEqual "untokenize . tokenize is identity" orig new
-          , testProperty "untokenize . tokenize is identity" tokUntokRt
-          ]
-
-        , testGroup "basic"
+tests = [ testGroup "basic"
           [ "simple" =:
             "word" =?> para "word"
           , "space" =:
@@ -185,7 +167,7 @@ tests = [ testGroup "tokenization"
                                   , simpleCell (plain "Two")
                                   ]
                    , Row nullAttr [ simpleCell (plain "Three") ]
-                   , Row nullAttr [ simpleCell (plain "Four") 
+                   , Row nullAttr [ simpleCell (plain "Four")
                                   , simpleCell (plain "Five")
                                   , simpleCell (plain "Six")
                                   , simpleCell (plain "Seven")
@@ -193,8 +175,8 @@ tests = [ testGroup "tokenization"
                    ]
           , "Table with multicolumn header" =:
             T.unlines [ "\\begin{tabular}{ |l|l| }"
-                      , "\\hline\\multicolumn{2}{|c|}{Header}\\\\" 
-                      , "\\hline key & val\\\\" 
+                      , "\\hline\\multicolumn{2}{|c|}{Header}\\\\"
+                      , "\\hline key & val\\\\"
                       , "\\hline\\end{tabular}"
                       ] =?>
             table emptyCaption

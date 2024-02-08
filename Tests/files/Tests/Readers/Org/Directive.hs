@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Org.Directive
-   Copyright   : © 2014-2020 Albert Krewinkel
+   Copyright   : © 2014-2023 Albert Krewinkel
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Albert Krewinkel <albert@zeitkraut.de>
@@ -13,7 +12,6 @@ Tests parsing of org directives (like @#+OPTIONS@).
 -}
 module Tests.Readers.Org.Directive (tests) where
 
-import Prelude
 import Data.Time (UTCTime (UTCTime), secondsToDiffTime)
 import Data.Time.Calendar (Day (ModifiedJulianDay))
 import Test.Tasty (TestTree, testGroup)
@@ -252,7 +250,7 @@ tests =
                     , "\\end{equation}"
                     ] =?>
           para (str "\\begin{equation}" <> softbreak <>
-                str "f(x) = x^2" <> softbreak <>
+                text "f(x) = x^2" <> softbreak <>
                 str "\\end{equation}")
         ]
       ]

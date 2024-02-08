@@ -165,7 +165,7 @@ namespace Tests {
                     ) :
                     "";
 
-            var filterPath = $@"{filtersRoot}\{filterName}\bin\{config}\net5.0\{filterName}.exe";
+            var filterPath = $@"{filtersRoot}\{filterName}\bin\{config}\net6.0\{filterName}.exe";
             var result = GetAst(docPath, filterPath, format);
             Assert.True(
                 result.StdErr.IsNullOrWhitespace() || ignoreWarning(result)
@@ -187,7 +187,7 @@ namespace Tests {
 
             var process = new Process {
                 StartInfo = {
-                    FileName = $@"{filtersRoot}\{filterName}\bin\{config}\net5.0\{filterName}.exe",
+                    FileName = $@"{filtersRoot}\{filterName}\bin\{config}\net6.0\{filterName}.exe",
                     UseShellExecute = false,
                     CreateNoWindow=true,
                     RedirectStandardInput = true,

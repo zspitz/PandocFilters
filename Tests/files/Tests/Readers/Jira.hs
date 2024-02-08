@@ -1,9 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {- |
    Module      : Tests.Readers.Jira
-   Copyright   : © 2019-2020 Albert Krewinel
+   Copyright   : © 2019-2023 Albert Krewinel
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Albert Krewinkel <tarleb@zeitkraut.de>
@@ -17,6 +16,7 @@ module Tests.Readers.Jira (tests) where
 import Prelude hiding (unlines)
 import Data.Text (Text, unlines)
 import Test.Tasty (TestTree, testGroup)
+import Test.Tasty.HUnit (HasCallStack)
 import Tests.Helpers (ToString, purely, test, (=?>))
 import Text.Pandoc (def)
 import Text.Pandoc.Readers.Jira (readJira)
@@ -26,7 +26,7 @@ jira :: Text -> Pandoc
 jira = purely $ readJira def
 
 infix 4 =:
-(=:) :: ToString c
+(=:) :: (ToString c, HasCallStack)
      => String -> (Text, c) -> TestTree
 (=:) = test jira
 
@@ -35,6 +35,9 @@ tests =
   [ testGroup "para"
     [ "Simple sentence" =:
       "Hello, World!" =?> para "Hello, World!"
+
+    , "leading blank lines" =:
+      "\n\ntext" =?> para "text"
     ]
 
   , testGroup "header"
@@ -94,6 +97,12 @@ tests =
       simpleTable [para "Name"] [[para "Test"]]
     ]
 
+  , testGroup "panel"
+    [ "simple panel" =:
+      "{panel}\nInterviewer: Jane Doe{panel}\n" =?>
+      divWith ("", ["panel"], []) (para "Interviewer: Jane Doe")
+    ]
+
   , testGroup "inlines"
     [ "emphasis" =:
       "*quid pro quo*" =?>
@@ -132,6 +141,10 @@ tests =
         "[Example|https://example.org]" =?>
         para (link "https://example.org" "" "Example")
 
+      , "URL in alias" =:
+        "[See https://example.com|https://example.com]" =?>
+        para (link "https://example.com" "" "See https://example.com")
+
       , "email" =:
         "[mailto:me@example.org]" =?>
         para (link "mailto:me@example.org" "" "me@example.org")
@@ -155,6 +168,14 @@ tests =
       , "user with description" =:
         "[John Doe|~johndoe]" =?>
         para (linkWith ("", ["user-account"], []) "~johndoe" "" "John Doe")
+
+      , "'smart' link" =:
+        "[x|http://example.com|smart-link]" =?>
+        para (linkWith ("", ["smart-link"], []) "http://example.com" "" "x")
+
+      , "'smart' card" =:
+        "[x|http://example.com|smart-card]" =?>
+        para (linkWith ("", ["smart-card"], []) "http://example.com" "" "x")
       ]
 
     , "image" =:

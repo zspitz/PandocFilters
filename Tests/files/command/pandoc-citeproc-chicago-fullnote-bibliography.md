@@ -48,20 +48,20 @@ References {#references .unnumbered}
 [^3]: Like a citation without author: [-@item1], and again
     [-@item1], and now Doe with a locator [-@item2 p. 44].
 ^D
-[WARNING] Citeproc: citation nonexistent not found
+2> [WARNING] Citeproc: citation nonexistent not found
 # Pandoc with citeproc-hs
 
 [^1]
 
 [^2]
 
-[John Doe](#ref-item1)[^3] says blah.
+John Doe[^3] says blah.
 
-[Doe](#ref-item1)[^4] says blah.
+Doe[^4] says blah.
 
-[Doe](#ref-item1)[^5] says blah.
+Doe[^5] says blah.
 
-[Doe](#ref-item1)[^6] says blah.
+Doe[^6] says blah.
 
 In a note.[^7]
 
@@ -81,7 +81,7 @@ With some markup.[^14]
 
 # References {#references .unnumbered}
 
-::: {#refs .references .csl-bib-body .hanging-indent}
+::: {#refs .references .csl-bib-body .hanging-indent entry-spacing="0"}
 ::: {#ref-item2 .csl-entry}
 Doe, John. "Article." *Journal of Generic Studies* 6 (2006): 33--34.
 :::
@@ -107,31 +107,28 @@ Sam Smith. Oxford: Oxford University Press, 2007.
 
 [^5]: [30](#ref-item1), with suffix.
 
-[^6]: [*First Book*, 2005](#ref-item1); ["Article," *Journal of Generic
+[^6]: [*First Book*](#ref-item1); ["Article," *Journal of Generic
     Studies* 6 (2006): 30](#ref-item2); see also [John Doe and Jenny
     Roe, "Why Water Is Wet," in *Third Book*, ed. Sam Smith (Oxford:
     Oxford University Press, 2007)](#ref-пункт3).
 
-[^7]: [Doe and Roe](#ref-пункт3), ["Why Water Is Wet," 12](#ref-пункт3)
-    and a citation without locators ([Doe and Roe, "Why Water Is
-    Wet"](#ref-пункт3)).
+[^7]: Doe and Roe, ["Why Water Is Wet," 12](#ref-пункт3) and a citation
+    without locators ([Doe and Roe, "Why Water Is Wet"](#ref-пункт3)).
 
-[^8]: See [Doe, *First Book*, 2005, chap. 3](#ref-item1); also [Doe and
-    Roe, "Why Water Is Wet," 34--35](#ref-пункт3).
+[^8]: See [Doe, *First Book*, chap. 3](#ref-item1); also [Doe and Roe,
+    "Why Water Is Wet," 34--35](#ref-пункт3).
 
-[^9]: See [Doe, *First Book*, 2005, 34--35](#ref-item1).
+[^9]: See [Doe, *First Book*, 34--35](#ref-item1).
 
 [^10]: Some citations (see [Doe, chap. 3](#ref-item1); [Doe and Roe,
-    "Why Water Is Wet"](#ref-пункт3); [Doe, "Article,"
-    2006](#ref-item2)).
+    "Why Water Is Wet"](#ref-пункт3); [Doe, "Article"](#ref-item2)).
 
-[^11]: [Doe, *First Book*, 2005, 33, 35--37](#ref-item1), and nowhere
-    else.
+[^11]: [Doe, *First Book*, 33, 35--37](#ref-item1), and nowhere else.
 
-[^12]: [Doe, *First Book*, 2005](#ref-item1) and nowhere else.
+[^12]: [Doe, *First Book*](#ref-item1) and nowhere else.
 
 [^13]: Like a citation without author: (), and again (), and now Doe
-    with a locator (["Article," 2006, 44](#ref-item2)).
+    with a locator (["Article," 44](#ref-item2)).
 
-[^14]: *See* [Doe, *First Book*, 2005, 32](#ref-item1).
+[^14]: *See* [Doe, *First Book*, 32](#ref-item1).
 ```

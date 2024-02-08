@@ -3,19 +3,21 @@
 \PassOptionsToPackage{hyphens}{url}
 %
 \documentclass[
-  english,
 ]{article}
 \usepackage{amsmath,amssymb}
-\usepackage{lmodern}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
 \else % if luatex or xetex
-  \usepackage{unicode-math}
+  \usepackage{unicode-math} % this also loads fontspec
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
 \fi
 % Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
@@ -34,63 +36,48 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  pdflang={en},
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
 \setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
-\ifxetex
-  % Load polyglossia as late as possible: uses bidi with RTL langages (e.g. Hebrew, Arabic)
-  \usepackage{polyglossia}
-  \setmainlanguage[]{english}
-  \setotherlanguage[]{german}
-  \setotherlanguage[variant=british]{english}
-  \setotherlanguage[variant=swiss]{german}
-  \setotherlanguage[]{spanish}
-  \setotherlanguage[]{french}
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
 \else
-  \usepackage[ngerman,british,nswissgerman,spanish,french,main=english]{babel}
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{english}
+\babelprovide[import]{ngerman}
+\babelprovide[import]{british}
+\babelprovide[import]{nswissgerman}
+\babelprovide[import]{spanish}
+\babelprovide[import]{french}
 % get rid of language-specific shorthands (see #6817):
 \let\LanguageShortHands\languageshorthands
 \def\languageshorthands#1{}
-  \newcommand{\textgerman}[2][]{\foreignlanguage{ngerman}{#2}}
-  \newenvironment{german}[2][]{\begin{otherlanguage}{ngerman}}{\end{otherlanguage}}
-  \newcommand{\textenglish}[2][]{\foreignlanguage{british}{#2}}
-  \newenvironment{english}[2][]{\begin{otherlanguage}{british}}{\end{otherlanguage}}
-  \let\oritextspanish\textspanish
-  \AddBabelHook{spanish}{beforeextras}{\renewcommand{\textspanish}{\oritextspanish}}
-  \AddBabelHook{spanish}{afterextras}{\renewcommand{\textspanish}[2][]{\foreignlanguage{spanish}{##2}}}
-  \newcommand{\textfrench}[2][]{\foreignlanguage{french}{#2}}
-  \newenvironment{french}[2][]{\begin{otherlanguage}{french}}{\end{otherlanguage}}
-\fi
-\ifluatex
+\ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
-\ifxetex
-  % Load bidi as late as possible as it modifies e.g. graphicx
-  \usepackage{bidi}
-\fi
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\ifPDFTeX
   \TeXXeTstate=1
   \newcommand{\RL}[1]{\beginR #1\endR}
   \newcommand{\LR}[1]{\beginL #1\endL}
   \newenvironment{RTL}{\beginR}{\endR}
   \newenvironment{LTR}{\beginL}{\endL}
 \fi
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdflang={en},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
 \author{}
 \date{}
 
 \begin{document}
 
-\hypertarget{empty-divs-and-spans}{%
-\section{Empty Divs and Spans}\label{empty-divs-and-spans}}
+\section{Empty Divs and Spans}\label{empty-divs-and-spans}
 
 Some text and
 
@@ -100,8 +87,7 @@ and more text.
 
 Next paragraph with a {span} and a word-thatincludesa{span}right?
 
-\hypertarget{directionality}{%
-\section{Directionality}\label{directionality}}
+\section{Directionality}\label{directionality}
 
 Some text and
 
@@ -118,41 +104,40 @@ and a ltr div. with a \RL{rtl span}.
 Next paragraph with a \RL{rtl span} and a
 word-that-includesa\LR{ltrspan}right?
 
-\hypertarget{languages}{%
-\section{Languages}\label{languages}}
+\section{Languages}\label{languages}
 
 Some text and
 
-\begin{german}
+\begin{otherlanguage}{ngerman}
 
 German div contents
 
-\end{german}
+\end{otherlanguage}
 
 and more text.
 
-Next paragraph with a \textenglish[variant=british]{British span} and a
-word-that-includesa\textgerman[variant=swiss]{Swiss German span}right?
+Next paragraph with a \foreignlanguage{british}{British span} and a
+word-that-includesa\foreignlanguage{nswissgerman}{Swiss German
+span}right?
 
-Some \textspanish{Spanish text}.
+Some \foreignlanguage{spanish}{Spanish text}.
 
-\hypertarget{combined}{%
-\section{Combined}\label{combined}}
+\section{Combined}\label{combined}
 
 Some text and
 
 \begin{RTL}
-\begin{french}
+\begin{otherlanguage}{french}
 
 French rtl div contents
 
-\end{french}
+\end{otherlanguage}
 \end{RTL}
 
 and more text.
 
-Next paragraph with a \LR{\textenglish[variant=british]{British ltr
-span}} and a word-that-includesa\LR{\textgerman[variant=swiss]{Swiss
-German ltr span}}right?
+Next paragraph with a \LR{\foreignlanguage{british}{British ltr span}}
+and a word-that-includesa\LR{\foreignlanguage{nswissgerman}{Swiss German
+ltr span}}right?
 
 \end{document}

@@ -1,4 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {- |
    Module      : Tests.Readers.FB2
    Copyright   : © 2018-2020 Alexander Krotov
@@ -8,11 +7,10 @@
    Stability   : alpha
    Portability : portable
 
-Tests for the EPUB mediabag.
+Tests for the FB2 reader.
 -}
 module Tests.Readers.FB2 (tests) where
 
-import Prelude
 import Test.Tasty
 import Tests.Helpers
 import Test.Tasty.Golden (goldenVsString)

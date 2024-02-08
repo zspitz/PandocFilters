@@ -1,8 +1,6 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 module Tests.Writers.AsciiDoc (tests) where
 
-import Prelude
 import Data.Text (unpack)
 import Test.Tasty
 import Tests.Helpers
@@ -11,13 +9,22 @@ import Text.Pandoc.Arbitrary ()
 import Text.Pandoc.Builder
 
 asciidoc :: (ToPandoc a) => a -> String
-asciidoc = unpack . purely (writeAsciiDoc def{ writerWrapText = WrapNone }) . toPandoc
+asciidoc = unpack . purely (writeAsciiDocLegacy def) . toPandoc
+
+asciidoctor :: (ToPandoc a) => a -> String
+asciidoctor = unpack . purely (writeAsciiDoc def) . toPandoc
 
 testAsciidoc :: (ToString a, ToPandoc a)
              => String
              -> (a, String)
              -> TestTree
 testAsciidoc = test asciidoc
+
+testAsciidoctor :: (ToString a, ToPandoc a)
+             => String
+             -> (a, String)
+             -> TestTree
+testAsciidoctor = test asciidoctor
 
 tests :: [TestTree]
 tests = [ testGroup "emphasis"
@@ -40,6 +47,22 @@ tests = [ testGroup "emphasis"
                para (singleQuoted (strong (text "foo"))) =?>
                  "`**foo**'"
           ]
+        , testGroup "blocks"
+          [ testAsciidoc "code block without line numbers" $
+               codeBlockWith ("", [ "haskell" ], []) "foo" =?> unlines
+                                           [ "[source,haskell]"
+                                           , "----"
+                                           , "foo"
+                                           , "----"
+                                           ]
+          , testAsciidoc "code block with line numbers" $
+               codeBlockWith ("", [ "haskell", "numberLines" ], []) "foo" =?> unlines
+                                           [ "[source%linesnum,haskell]"
+                                           , "----"
+                                           , "foo"
+                                           , "----"
+                                           ]
+          ]
         , testGroup "tables"
           [ testAsciidoc "empty cells" $
                simpleTable [] [[mempty],[mempty]] =?> unlines
@@ -60,6 +83,13 @@ tests = [ testGroup "emphasis"
                                            , "Para 2"
                                            , ""
                                            , "|==="
+                                           ]
+          ]
+        , testGroup "lists"
+          [ testAsciidoctor "bullet task list" $
+               bulletList [plain "☐ a", plain "☒ b"] =?> unlines
+                                           [ "* [ ] a"
+                                           , "* [x] b"
                                            ]
           ]
         ]

@@ -1,6 +1,6 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings   #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections #-}
 {- |
    Module      : Tests.Readers.DokuWiki
    Copyright   : © 2018-2020 Alexander Krotov
@@ -14,10 +14,10 @@ Tests for DokuWiki reader.
 -}
 module Tests.Readers.DokuWiki (tests) where
 
-import Prelude
 import Data.Text (Text)
 import qualified Data.Text as T
 import Test.Tasty
+import Test.Tasty.HUnit (HasCallStack)
 import Tests.Helpers
 import Text.Pandoc
 import Text.Pandoc.Arbitrary ()
@@ -27,7 +27,7 @@ dokuwiki :: Text -> Pandoc
 dokuwiki = purely $ readDokuWiki def{ readerStandalone = True }
 
 infix 4 =:
-(=:) :: ToString c
+(=:) :: (ToString c, HasCallStack)
      => String -> (Text, c) -> TestTree
 (=:) = test dokuwiki
 
@@ -71,16 +71,17 @@ tests = [ testGroup "inlines"
             para (strikeout "deleted")
           , "Inline code" =:
             "foo <code java>public static void main</code> bar" =?>
-            para (text "foo " <> codeWith ("", ["java"], []) "public static void main" <> text " bar")
+            para (text "foo") <> codeBlockWith ("", ["java"], []) "public static void main"
+              <> para (text "bar")
           , "Inline file" =:
             "foo <file></code></file> bar" =?>
-            para (text "foo " <> code "</code>" <> text " bar")
+            para (text "foo") <> codeBlock "</code>" <> para (text "bar")
           , "Inline HTML" =:
             "<html>\nThis is some <span style=\"color:red;font-size:150%;\">inline HTML</span>\n</html>" =?>
             para (rawInline "html" "\nThis is some <span style=\"color:red;font-size:150%;\">inline HTML</span>\n")
           , "Inline PHP" =:
             "<php>echo '<p>Hello World</p>';</php>" =?>
-            para (codeWith ("", ["php"], []) "echo '<p>Hello World</p>';")
+            para (rawInline "html" "<?php echo '<p>Hello World</p>'; ?>")
           , "Linebreak" =:
             T.unlines [ "This is some text with some linebreaks\\\\ Note that the"
                       , "two backslashes are only recognized at the end of a line\\\\"
@@ -167,10 +168,10 @@ tests = [ testGroup "inlines"
               para (imageWith ("", ["align-center"], []) "/wiki/dokuwiki-128.png" "" (str "dokuwiki-128.png"))
             , "Image with width" =:
               "{{wiki:dokuwiki-128.png?50}}" =?>
-              para (imageWith ("", [], [("width", "50")]) "/wiki/dokuwiki-128.png" "" (str "dokuwiki-128.png"))
+              para (imageWith ("", [], [("width", "50"), ("query", "?50")]) "/wiki/dokuwiki-128.png" "" (str "dokuwiki-128.png"))
             , "Image with width and height" =:
               "{{wiki:dokuwiki-128.png?nocache&50x100}}" =?>
-              para (imageWith ("", [], [("width", "50"), ("height", "100")]) "/wiki/dokuwiki-128.png" "" (str "dokuwiki-128.png"))
+              para (imageWith ("", [], [("width", "50"), ("height", "100"), ("query", "?nocache&50x100")]) "/wiki/dokuwiki-128.png" "" (str "dokuwiki-128.png"))
             , "Linkonly" =:
               "{{wiki:dokuwiki-128.png?linkonly}}" =?>
               para (link "/wiki/dokuwiki-128.png" "" (str "dokuwiki-128.png"))
@@ -226,12 +227,12 @@ tests = [ testGroup "inlines"
           , "Ordered list" =:
             T.unlines [ "  - The same list but ordered"
                       , "  - Another item"
-                      , "    - Just use indention for deeper levels"
+                      , "    - Just use indentation for deeper levels"
                       , "  - That's it"
                       ] =?>
             orderedList [ plain "The same list but ordered"
                         , plain "Another item" <>
-                          orderedList [ plain "Just use indention for deeper levels" ]
+                          orderedList [ plain "Just use indentation for deeper levels" ]
                         , plain "That's it"
                         ]
           , "Multiline list items" =: -- https://www.dokuwiki.org/faq:lists
@@ -245,7 +246,7 @@ tests = [ testGroup "inlines"
                       ] =?>
             orderedList [ plain "first item"
                         , plain ("second item with linebreak" <> linebreak <> " second line")
-                        , plain ("third item with code: " <> code "some code\ncomes here\n")
+                        , plain "third item with code: " <> codeBlock "some code\ncomes here\n"
                         , plain "fourth item"
                         ]
           ]
@@ -260,7 +261,7 @@ tests = [ testGroup "inlines"
                     , "echo '<p>Hello World</p>';"
                     , "</PHP>"
                     ] =?>
-          codeBlockWith ("", ["php"], []) "echo '<p>Hello World</p>';\n"
+          rawBlock "html" "<?php echo '<p>Hello World</p>';\n ?>"
         , "Quote" =:
           T.unlines [ "> foo"
                     , ">no space is required after >"
@@ -302,6 +303,17 @@ tests = [ testGroup "inlines"
                     , "| bat | baz |"
                     ] =?>
           simpleTable [plain "foo", plain "bar"] [[plain "bat", plain "baz"]]
+        , "Table with alignment" =:
+          T.unlines [ "^ 0  ^  1  ^  2 ^ 3 ^"
+                    , "| a  | b   | c  |d  |"
+                    ] =?>
+          table emptyCaption
+                (map (, ColWidthDefault) [AlignLeft, AlignCenter, AlignRight, AlignDefault])
+                (TableHead nullAttr
+                          [Row nullAttr . map (simpleCell . plain) $ ["0", "1", "2", "3"]])
+                [TableBody nullAttr 0 []
+                          [Row nullAttr . map (simpleCell . plain) $ ["a", "b", "c", "d"]]]
+                (TableFoot nullAttr [])
         , "Table with colspan" =:
           T.unlines [ "^ 0,0 ^ 0,1 ^ 0,2 ^"
                     , "| 1,0 | 1,1 ||"

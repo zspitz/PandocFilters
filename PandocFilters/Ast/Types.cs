@@ -65,6 +65,7 @@ namespace PandocFilters.Ast {
         Header,
         HorizontalRule,
         Table,
+        Figure,
         Div
     > {
         private Block(OneOf<
@@ -80,6 +81,7 @@ namespace PandocFilters.Ast {
             Header,
             HorizontalRule,
             Table,
+            Figure,
             Div
         > value) : base(value) { }
 
@@ -95,6 +97,7 @@ namespace PandocFilters.Ast {
         public static implicit operator Block(Header header) => new(header);
         public static implicit operator Block(HorizontalRule horizontalrule) => new(horizontalrule);
         public static implicit operator Block(Table table) => new(table);
+        public static implicit operator Block(Figure figure) => new(figure);
         public static implicit operator Block(Div div) => new(div);
 
         public override string? ToString() => Value.ToString();
@@ -141,6 +144,12 @@ namespace PandocFilters.Ast {
         TableHead TableHead,
         ImmutableList<TableBody> TableBodies,
         TableFoot TableFoot
+    );
+
+    public record Figure(
+        Attr Attr,
+        Caption Caption,
+        ImmutableList<Block> Blocks
     );
 
     /// <summary>Generic block container with attributes</summary>

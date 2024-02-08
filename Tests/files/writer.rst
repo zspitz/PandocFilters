@@ -4,7 +4,7 @@ Pandoc Test Suite
 
 :Author: John MacFarlane
 :Author: Anonymous
-:Date:   July 17, 2006
+:Date: July 17, 2006
 
 .. role:: raw-latex(raw)
    :format: latex
@@ -580,8 +580,8 @@ Superscripts: a\ :sup:`bc`\ d a\ :sup:`hello` a\ :sup:`hello there`.
 
 Subscripts: H\ :sub:`2`\ O, H\ :sub:`23`\ O, H\ :sub:`many of them`\ O.
 
-These should not be superscripts or subscripts, because of the unescaped
-spaces: a^b c^d, a~b c~d.
+These should not be superscripts or subscripts, because of the unescaped spaces:
+a^b c^d, a~b c~d.
 
 --------------
 
@@ -784,7 +784,7 @@ Images
 From “Voyage dans la Lune” by Georges Melies (1902):
 
 .. figure:: lalune.jpg
-   :alt: Voyage dans la Lune
+   :alt: lalune
 
    lalune
 

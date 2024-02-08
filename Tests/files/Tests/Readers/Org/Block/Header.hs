@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Org.Block.Header
-   Copyright   : © 2014-2020 Albert Krewinkel
+   Copyright   : © 2014-2023 Albert Krewinkel
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Albert Krewinkel <albert@zeitkraut.de>
@@ -13,7 +12,6 @@ Test parsing of org header blocks.
 -}
 module Tests.Readers.Org.Block.Header (tests) where
 
-import Prelude
 import Test.Tasty (TestTree, testGroup)
 import Tests.Helpers ((=?>))
 import Tests.Readers.Org.Shared ((=:), spcSep, tagSpan)

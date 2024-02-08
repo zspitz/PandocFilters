@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Org.Meta
-   Copyright   : © 2014-2020 Albert Krewinkel
+   Copyright   : © 2014-2023 Albert Krewinkel
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Albert Krewinkel <albert@zeitkraut.de>
@@ -13,7 +12,6 @@ Tests parsing of org meta data (mostly lines starting with @#+@).
 -}
 module Tests.Readers.Org.Meta (tests) where
 
-import Prelude
 import Test.Tasty (TestTree, testGroup)
 import Tests.Helpers ((=?>))
 import Tests.Readers.Org.Shared ((=:), spcSep)
@@ -116,6 +114,16 @@ tests =
       "#+LANGUAGE: de-DE" =?>
       Pandoc (setMeta "lang" (MetaString "de-DE") nullMeta) mempty
 
+    , testGroup "Todo sequences"
+      [ "not included in document" =:
+        "#+todo: WAITING | FINISHED" =?>
+        Pandoc mempty mempty
+
+      , "can contain multiple pipe characters" =:
+        "#+todo: UNFINISHED | RESEARCH | NOTES | CHART\n" =?>
+        Pandoc mempty mempty
+      ]
+
     , testGroup "LaTeX"
       [ "LATEX_HEADER" =:
         "#+latex_header: \\usepackage{tikz}" =?>
@@ -200,12 +208,19 @@ tests =
       ]
 
     , testGroup "emphasis config"
-      [ "Changing pre and post chars for emphasis" =:
-        T.unlines [ "#+pandoc-emphasis-pre: \"[)\""
-                  , "#+pandoc-emphasis-post: \"]\\n\""
-                  , "([/emph/])*foo*"
+      [ "Changing pre chars for emphasis" =:
+        T.unlines [ "#+pandoc-emphasis-pre: \"[)$a1%\""
+                  , "[/emph/.)*strong*.a~code~"
                   ] =?>
-        para ("([" <> emph "emph" <> "])" <> strong "foo")
+        para ("[" <> emph "emph" <> ".)" <> strong "strong" <>
+              ".a" <> code "code")
+
+      , "Changing post chars for emphasis" =:
+        T.unlines [ "#+pandoc-emphasis-post: \"(]$a1%\""
+                  , "/emph/('*strong*]'~code~a"
+                  ] =?>
+        para (emph "emph" <> "('" <> strong "strong" <> "]'" <>
+              code "code" <> "a")
 
       , "setting an invalid value restores the default" =:
         T.unlines [ "#+pandoc-emphasis-pre: \"[\""
@@ -230,7 +245,7 @@ tests =
                 , "  :setting: foo"
                 , "  :END:"
                 ] =?>
-      (mempty::Blocks)
+      (setMeta "setting" ("foo" :: T.Text) (doc mempty))
 
   , "Logbook drawer" =:
       T.unlines [ "  :LogBook:"

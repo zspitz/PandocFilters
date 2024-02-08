@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-                  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd">
-<article>
+"http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+[
+<!ENTITY GHC "GHC" >
+<!ENTITY let "LET" >
+<!ENTITY case "CASE" >
+]>
+<article xmlns="http://docbook.org/ns/docbook"
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         xmlns:mml="http://www.w3.org/1998/Math/MathML">
   <articleinfo>
     <title>Pandoc Test Suite</title>
     <authorgroup>
@@ -95,6 +102,11 @@ sub status {
     print &quot;working&quot;;
 }
 </programlisting>
+    <programlisting linenumbering="numbered">
+sub status {
+    print &quot;working with line numbers&quot;;
+}
+</programlisting>
     <screen>
 % <command>ls</command>
 </screen>
@@ -182,9 +194,9 @@ These should not be escaped:  \$ \\ \&gt; \[ \{
       </listitem>
     </itemizedlist>
     <para>
-      Pluses loose:
+      Asterisks tight:
     </para>
-    <itemizedlist>
+    <itemizedlist spacing="compact">
       <listitem>
         <para>
           Plus 1
@@ -198,26 +210,6 @@ These should not be escaped:  \$ \\ \&gt; \[ \{
       <listitem>
         <para>
           Plus 3
-        </para>
-      </listitem>
-    </itemizedlist>
-    <para>
-      Minuses loose:
-    </para>
-    <itemizedlist>
-      <listitem>
-        <para>
-          Minus 1
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          Minus 2
-        </para>
-      </listitem>
-      <listitem>
-        <para>
-          Minus 3
         </para>
       </listitem>
     </itemizedlist>
@@ -242,9 +234,9 @@ These should not be escaped:  \$ \\ \&gt; \[ \{
       </listitem>
     </orderedlist>
     <para>
-      and using spaces:
+      and tight:
     </para>
-    <orderedlist numeration="arabic">
+    <orderedlist spacing="compact" numeration="arabic">
       <listitem>
         <para>
           One
@@ -717,6 +709,9 @@ These should not be escaped:  \$ \\ \&gt; \[ \{
   </para>
   <para>
     More code: <classname>Class</classname> and <type>Type</type>
+  </para>
+  <para>
+    Referencing a man page: <citerefentry><refentrytitle>nix.conf</refentrytitle><manvolnum>5</manvolnum></citerefentry>
   </para>
   <para>
     <emphasis role="strikethrough">This is
@@ -1587,5 +1582,21 @@ or here: &lt;http://example.com/&gt;
       </para>
     </step>
   </procedure>
+</sect1>
+<sect1 id="indexterms">
+  <title>Index terms</title>
+  <para>
+    In the simplest case, index terms<indexterm><primary>index term</primary></indexterm> consists of just a <code>&lt;primary&gt;</code> element, but <indexterm><primary>index term</primary><secondary>multi-level</secondary></indexterm> they can also consist of a <code>&lt;primary&gt;</code> <emph>and</emph> <code>&lt;secondary&gt;</code> element, and <indexterm><primary>index term</primary><secondary>multi-level</secondary><tertiary>3-level</tertiary></indexterm> can even include a <code>&lt;tertiary&gt;</code> term.
+  </para>
+  <para>
+    Index terms can also refer to other index terms: <indexterm><primary>index cross referencing</primary></indexterm><indexterm><primary>index term</primary><secondary>cross references</secondary><see>index cross referencing</see></indexterm>exclusively, using the <code>&lt;see&gt;</code> tag; or <indexterm><primary>index cross referencing</primary><seealso>cross referencing</seealso></indexterm> as a reference to related terms, using the <code>&lt;seealso&gt;</code> tag.
+  </para>
+  <para>
+    <indexterm><primary>food</primary><secondary>big <foreignphrase>baguette</foreignphrase> <strong>supreme</strong></secondary></indexterm>Nested content in index term elements is flattened.
+  </para>
+</sect1>
+<sect1 id="titleabbrev">
+  <title>Abbreviated title</title>
+  <titleabbrev>Abbr. title</titleabbrev>
 </sect1>
 </article>

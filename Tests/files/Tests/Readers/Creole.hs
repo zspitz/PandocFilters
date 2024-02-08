@@ -1,9 +1,8 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Creole
    Copyright   : © 2017 Sascha Wilde
-                   2017-2020 John MacFarlane
+                   2017-2023 John MacFarlane
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Sascha Wilde <wilde@sha-bang.de>
@@ -14,10 +13,10 @@ Tests for the creole reader.
 -}
 module Tests.Readers.Creole (tests) where
 
-import Prelude
 import Data.Text (Text)
 import qualified Data.Text as T
 import Test.Tasty
+import Test.Tasty.HUnit (HasCallStack)
 import Tests.Helpers
 import Text.Pandoc
 import Text.Pandoc.Arbitrary ()
@@ -27,7 +26,7 @@ creole :: Text -> Pandoc
 creole = purely $ readCreole def{ readerStandalone = True }
 
 infix 4 =:
-(=:) :: ToString c
+(=:) :: (ToString c, HasCallStack)
      => String -> (Text, c) -> TestTree
 (=:) = test creole
 
@@ -120,7 +119,7 @@ tests = [
                          , plain "blubb" ]
         , "nested many unordered lists, one separating space" =:
           ("* foo\n** bar\n*** third\n*** third two\n** baz\n*** third again\n"
-           <> "**** fourth\n***** fith\n* blubb")
+           <> "**** fourth\n***** fifth\n* blubb")
           =?> bulletList [ plain "foo"
                            <> bulletList [ plain "bar"
                                            <> bulletList [ plain "third"
@@ -130,7 +129,7 @@ tests = [
                                                          <> bulletList [
                                                              plain "fourth"
                                                              <> bulletList [
-                                                                 plain "fith"
+                                                                 plain "fifth"
                                                                  ]
                                                              ]
                                                          ]
@@ -167,7 +166,7 @@ tests = [
                          , plain "blubb" ]
         , "nested many ordered lists, one separating space" =:
           ("# foo\n## bar\n### third\n### third two\n## baz\n### third again\n"
-           <> "#### fourth\n##### fith\n# blubb")
+           <> "#### fourth\n##### fifth\n# blubb")
           =?> orderedList [ plain "foo"
                            <> orderedList [ plain "bar"
                                            <> orderedList [ plain "third"
@@ -177,7 +176,7 @@ tests = [
                                                          <> orderedList [
                                                              plain "fourth"
                                                              <> orderedList [
-                                                                 plain "fith"
+                                                                 plain "fifth"
                                                                  ]
                                                              ]
                                                          ]
@@ -190,7 +189,7 @@ tests = [
                          , plain "blubb" ]
         , "mixed nested ordered and unordered lists, one separating space" =:
           ("# foo\n** bar\n### third\n### third two\n** baz\n### third again\n"
-           <> "#### fourth\n***** fith\n# blubb")
+           <> "#### fourth\n***** fifth\n# blubb")
           =?> orderedList [ plain "foo"
                            <> bulletList [ plain "bar"
                                            <> orderedList [ plain "third"
@@ -200,7 +199,7 @@ tests = [
                                                          <> orderedList [
                                                              plain "fourth"
                                                              <> bulletList [
-                                                                 plain "fith"
+                                                                 plain "fifth"
                                                                  ]
                                                              ]
                                                          ]

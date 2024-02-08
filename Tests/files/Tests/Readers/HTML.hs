@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.HTML
-   Copyright   : © 2006-2020 John MacFarlane
+   Copyright   : © 2006-2023 John MacFarlane
    License     : GNU GPL, version 2 or above
 
    Maintainer  : John MacFarlane <jgm@berkeley.edu>
@@ -13,7 +12,6 @@ Tests for the HTML reader.
 -}
 module Tests.Readers.HTML (tests) where
 
-import Prelude
 import Data.Text (Text)
 import qualified Data.Text as T
 import Test.Tasty
@@ -76,6 +74,12 @@ tests = [ testGroup "base tag"
           [ test html "anchor without href" $ "<a name=\"anchor\"/>" =?>
             plain (spanWith ("anchor",[],[]) mempty)
           ]
+        , testGroup "img"
+          [ test html "data-external attribute" $ "<img data-external=\"1\" src=\"http://example.com/stickman.gif\">" =?>
+            plain (imageWith ("", [], [("external", "1")]) "http://example.com/stickman.gif" "" "")
+          , test html "title" $ "<img title=\"The title\" src=\"http://example.com/stickman.gif\">" =?>
+            plain (imageWith ("", [], []) "http://example.com/stickman.gif" "The title" "")
+          ]
         , testGroup "lang"
           [ test html "lang on <html>" $ "<html lang=\"es\">hola" =?>
             setMeta "lang" (text "es") (doc (plain (text "hola")))
@@ -94,6 +98,18 @@ tests = [ testGroup "base tag"
           , test htmlNativeDivs "<main> followed by text" $ "<main>main content</main>non-main content" =?>
             doc (divWith ("", [], [("role", "main")]) (plain (text "main content")) <> plain (text "non-main content"))
           ]
+        , testGroup "code"
+          [
+            test html "inline code block" $
+            "<code>Answer is 42</code>" =?>
+            plain (codeWith ("",[],[]) "Answer is 42")
+          ]
+        , testGroup "tt"
+          [
+            test html "inline tt block" $
+            "<tt>Answer is 42</tt>" =?>
+            plain (codeWith ("",[],[]) "Answer is 42")
+          ]
         , testGroup "samp"
           [
             test html "inline samp block" $
@@ -101,11 +117,26 @@ tests = [ testGroup "base tag"
             plain (codeWith ("",["sample"],[]) "Answer is 42")
           ]
         , testGroup "var"
-        [
-          test html "inline var block" $
-          "<var>result</var>" =?>
-          plain (codeWith ("",["variable"],[]) "result")
-        ]
+          [ test html "inline var block" $
+            "<var>result</var>" =?>
+            plain (codeWith ("",["variable"],[]) "result")
+          ]
+        , testGroup "header"
+          [ test htmlNativeDivs "<header> is parsed as a div" $
+            "<header id=\"title\">Title</header>" =?>
+            divWith ("title", mempty, mempty) (plain "Title")
+          ]
+        , testGroup "code block"
+          [ test html "attributes in pre > code element" $
+            "<pre><code id=\"a\" class=\"python\">\nprint('hi')\n</code></pre>"
+            =?>
+            codeBlockWith ("a", ["python"], []) "print('hi')"
+
+          , test html "attributes in pre take precedence" $
+            "<pre id=\"c\"><code id=\"d\">\nprint('hi mom!')\n</code></pre>"
+            =?>
+            codeBlockWith ("c", [], []) "print('hi mom!')"
+          ]
         , askOption $ \(QuickCheckTests numtests) ->
             testProperty "Round trip" $
               withMaxSuccess (if QuickCheckTests numtests == defaultValue

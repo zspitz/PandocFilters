@@ -35,6 +35,7 @@ namespace PandocFilters.Ast {
                 header => VisitHeader(header),
                 horizontalRule => VisitHorizontalRule(horizontalRule),
                 table => VisitTable(table),
+                figure => VisitFigure(figure),
                 div => VisitDiv(div)
             );
 
@@ -98,6 +99,13 @@ namespace PandocFilters.Ast {
                 TableHead = VisitTableHead(table.TableHead),
                 TableBodies = table.TableBodies.Select(VisitTableBody).ToImmutableList(),
                 TableFoot = VisitTableFoot(table.TableFoot)
+            };
+
+        public virtual Figure VisitFigure(Figure figure) =>
+            figure with {
+                Attr = VisitAttr(figure.Attr),
+                Caption = VisitCaption(figure.Caption),
+                Blocks = figure.Blocks.Select(VisitBlock).ToImmutableList()
             };
 
         public virtual Div VisitDiv(Div div) =>

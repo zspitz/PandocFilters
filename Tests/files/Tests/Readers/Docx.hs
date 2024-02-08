@@ -1,4 +1,3 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Docx
@@ -13,7 +12,6 @@ Tests for the word docx reader.
 -}
 module Tests.Readers.Docx (tests) where
 
-import Prelude
 import Codec.Archive.Zip
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy as B
@@ -26,7 +24,7 @@ import Test.Tasty.HUnit
 import Tests.Helpers
 import Text.Pandoc
 import qualified Text.Pandoc.Class as P
-import Text.Pandoc.MediaBag (MediaBag, lookupMedia, mediaDirectory)
+import qualified Text.Pandoc.MediaBag as MB
 import Text.Pandoc.UTF8 as UTF8
 
 -- We define a wrapper around pandoc that doesn't normalize in the
@@ -93,11 +91,11 @@ getMedia :: FilePath -> FilePath -> IO (Maybe B.ByteString)
 getMedia archivePath mediaPath = fmap fromEntry . findEntryByPath
     ("word/" ++ mediaPath) . toArchive <$> B.readFile archivePath
 
-compareMediaPathIO :: FilePath -> MediaBag -> FilePath -> IO Bool
+compareMediaPathIO :: FilePath -> MB.MediaBag -> FilePath -> IO Bool
 compareMediaPathIO mediaPath mediaBag docxPath = do
   docxMedia <- getMedia docxPath mediaPath
-  let mbBS   = case lookupMedia mediaPath mediaBag of
-                 Just (_, bs) -> bs
+  let mbBS   = case MB.lookupMedia mediaPath mediaBag of
+                 Just item    -> MB.mediaContents item
                  Nothing      -> error ("couldn't find " ++
                                         mediaPath ++
                                         " in media bag")
@@ -112,7 +110,7 @@ compareMediaBagIO docxFile = do
     mb <- runIOorExplode $ readDocx defopts df >> P.getMediaBag
     bools <- mapM
              (\(fp, _, _) -> compareMediaPathIO fp mb docxFile)
-             (mediaDirectory mb)
+             (MB.mediaDirectory mb)
     return $ and bools
 
 testMediaBagIO :: String -> FilePath -> IO TestTree
@@ -150,6 +148,18 @@ tests = [ testGroup "document"
             "docx/instrText_hyperlink.docx"
             "docx/instrText_hyperlink.native"
           , testCompare
+            "nested fields with <w:instrText> tag"
+            "docx/nested_instrText.docx"
+            "docx/nested_instrText.native"
+          , testCompare
+            "empty fields with <w:instrText> tag"
+            "docx/empty_field.docx"
+            "docx/empty_field.native"
+          , testCompare
+            "pageref hyperlinks in <w:instrText> tag"
+            "docx/pageref.docx"
+            "docx/pageref.native"
+          , testCompare
             "inline image"
             "docx/image.docx"
             "docx/image_no_embed.native"
@@ -157,6 +167,10 @@ tests = [ testGroup "document"
             "VML image"
             "docx/image_vml.docx"
             "docx/image_vml.native"
+          , testCompare
+            "VML image as object"
+            "docx/image_vml_as_object.docx"
+            "docx/image_vml_as_object.native"
           , testCompare
             "inline image in links"
             "docx/inline_images.docx"
@@ -221,6 +235,10 @@ tests = [ testGroup "document"
             "collapse overlapping targets (anchor spans)"
             "docx/overlapping_targets.docx"
             "docx/overlapping_targets.native"
+          , testCompare
+            "text in shape format"
+            "docx/text_in_shape_format.docx"
+            "docx/text_in_shape_format.native"
           ]
         , testGroup "blocks"
           [ testCompare
@@ -302,7 +320,11 @@ tests = [ testGroup "document"
           , testCompare
             "blockquotes (parsing indent as blockquote)"
             "docx/block_quotes.docx"
-            "docx/block_quotes_parse_indent.native"
+            "docx/block_quotes.native"
+          , testCompare
+            "blockquotes (parsing indent relative to the indent of the parent style as blockquote)"
+            "docx/relative_indentation_blockquotes.docx"
+            "docx/relative_indentation_blockquotes.native"
           , testCompare
             "hanging indents"
             "docx/hanging_indent.docx"
@@ -316,13 +338,29 @@ tests = [ testGroup "document"
             "docx/table_with_list_cell.docx"
             "docx/table_with_list_cell.native"
           , testCompare
+            "a table with a header which contains rowspans greater than 1"
+            "docx/table_header_rowspan.docx"
+            "docx/table_header_rowspan.native"
+          , testCompare
             "tables with one row"
             "docx/table_one_row.docx"
             "docx/table_one_row.native"
           , testCompare
+            "tables with just one row, which is a header"
+            "docx/table_one_header_row.docx"
+            "docx/table_one_header_row.native"
+          , testCompare
             "tables with variable width"
             "docx/table_variable_width.docx"
             "docx/table_variable_width.native"
+          , testCompare
+            "tables with captions which contain a Table field"
+            "docx/table_captions_with_field.docx"
+            "docx/table_captions_with_field.native"
+          , testCompare
+            "tables with captions which don't contain a Table field"
+            "docx/table_captions_no_field.docx"
+            "docx/table_captions_no_field.native"
           , testCompare
             "code block"
             "docx/codeblock.docx"
@@ -335,6 +373,26 @@ tests = [ testGroup "document"
             "dropcap paragraphs"
             "docx/drop_cap.docx"
             "docx/drop_cap.native"
+          ]
+        , testGroup "citations"
+          [ testCompare
+            "zotero with -citations"
+            "docx/zotero_citations.docx"
+            "docx/zotero_citations_minus.native"
+          , testCompareWithOpts def{readerExtensions =
+                  extensionsFromList [Ext_citations]}
+            "zotero with +citations"
+            "docx/zotero_citations.docx"
+            "docx/zotero_citations_plus.native"
+          , testCompare
+            "mendeley with -citations"
+            "docx/mendeley_citations.docx"
+            "docx/mendeley_citations_minus.native"
+          , testCompareWithOpts def{readerExtensions =
+                  extensionsFromList [Ext_citations]}
+            "mendeley with +citations"
+            "docx/mendeley_citations.docx"
+            "docx/mendeley_citations_plus.native"
           ]
         , testGroup "track changes"
           [ testCompare

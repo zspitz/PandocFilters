@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Org.Block.Table
-   Copyright   : © 2014-2020 Albert Krewinkel
+   Copyright   : © 2014-2023 Albert Krewinkel
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Albert Krewinkel <albert@zeitkraut.de>
@@ -13,7 +12,6 @@ Test parsing of org tables.
 -}
 module Tests.Readers.Org.Block.Table (tests) where
 
-import Prelude
 import Test.Tasty (TestTree)
 import Tests.Helpers ((=?>))
 import Tests.Readers.Org.Shared ((=:), spcSep)
@@ -27,12 +25,16 @@ simpleTable' :: Int
 simpleTable' n = simpleTable'' emptyCaption $ replicate n (AlignDefault, ColWidthDefault)
 
 simpleTable'' :: Caption -> [ColSpec] -> [Blocks] -> [[Blocks]] -> Blocks
-simpleTable'' capt spec headers rows
-  = table capt
-          spec
-          (TableHead nullAttr $ toHeaderRow headers)
-          [TableBody nullAttr 0 [] $ map toRow rows]
-          (TableFoot nullAttr [])
+simpleTable'' = simpleTableWith'' (mempty, [], [])
+
+simpleTableWith'' :: Attr -> Caption -> [ColSpec] -> [Blocks] -> [[Blocks]] -> Blocks
+simpleTableWith'' attr capt spec headers rows
+  = tableWith attr
+              capt
+              spec
+              (TableHead nullAttr $ toHeaderRow headers)
+              [TableBody nullAttr 0 [] $ map toRow rows]
+              (TableFoot nullAttr [])
   where
     toRow = Row nullAttr . map simpleCell
     toHeaderRow l = [toRow l | not (null l)]
@@ -183,6 +185,9 @@ tests =
       T.unlines [ "#+name: x-marks-the-spot"
                 , "| x |"
                 ] =?>
-      divWith ("x-marks-the-spot", mempty, mempty)
-              (simpleTable' 1 mempty [ [ plain "x" ] ])
+      simpleTableWith'' ("x-marks-the-spot", mempty, mempty)
+                        emptyCaption
+                        (replicate 1 (AlignDefault, ColWidthDefault))
+                        mempty
+                        [ [ plain "x" ] ]
   ]

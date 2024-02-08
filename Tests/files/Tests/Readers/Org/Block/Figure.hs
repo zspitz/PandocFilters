@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Org.Block.Figure
-   Copyright   : © 2014-2020 Albert Krewinkel
+   Copyright   : © 2014-2023 Albert Krewinkel
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Albert Krewinkel <albert@zeitkraut.de>
@@ -13,35 +12,39 @@ Test parsing of org figures.
 -}
 module Tests.Readers.Org.Block.Figure (tests) where
 
-import Prelude
 import Test.Tasty (TestTree)
 import Tests.Helpers ((=?>))
 import Tests.Readers.Org.Shared ((=:))
-import Text.Pandoc.Builder (image, imageWith, para)
+import Text.Pandoc.Builder ( emptyCaption, figure, figureWith, image
+                           , plain, simpleCaption, simpleFigure )
 import qualified Data.Text as T
 
 tests :: [TestTree]
 tests =
   [ "Figure" =:
-      T.unlines [ "#+caption: A very courageous man."
-                , "#+name: goodguy"
+      T.unlines [ "#+caption: A courageous man."
+                , "#+name: ed"
                 , "[[file:edward.jpg]]"
                 ] =?>
-      para (image "edward.jpg" "fig:goodguy" "A very courageous man.")
+      figureWith ("ed", mempty, mempty)
+             (plainCaption "A courageous man.")
+             (plain $ image "edward.jpg" mempty "")
 
   , "Figure with no name" =:
       T.unlines [ "#+caption: I've been through the desert on this"
                 , "[[file:horse.png]]"
                 ] =?>
-      para (image "horse.png" "fig:" "I've been through the desert on this")
+      figure (plainCaption "I've been through the desert on this")
+             (plain $ image "horse.png" "" "")
 
   , "Figure with `fig:` prefix in name" =:
       T.unlines [ "#+caption: Used as a metapher in evolutionary biology."
                 , "#+name: fig:redqueen"
                 , "[[./the-red-queen.jpg]]"
                 ] =?>
-      para (image "./the-red-queen.jpg" "fig:redqueen"
-                  "Used as a metapher in evolutionary biology.")
+      figureWith ("fig:redqueen", mempty, mempty)
+             (plainCaption "Used as a metapher in evolutionary biology.")
+             (plain $ image "./the-red-queen.jpg" mempty "")
 
   , "Figure with HTML attributes" =:
       T.unlines [ "#+caption: mah brain just explodid"
@@ -50,28 +53,33 @@ tests =
                 , "[[file:lambdacat.jpg]]"
                 ] =?>
       let kv = [("style", "color: blue"), ("role", "button")]
-          name = "fig:lambdacat"
-          caption = "mah brain just explodid"
-      in para (imageWith (mempty, mempty, kv) "lambdacat.jpg" name caption)
+          name = "lambdacat"
+          capt = plain "mah brain just explodid"
+      in figureWith (name, mempty, kv) (simpleCaption capt)
+         (plain $ image "lambdacat.jpg" mempty "")
 
   , "LaTeX attributes are ignored" =:
       T.unlines [ "#+caption: Attribute after caption"
                 , "#+attr_latex: :float nil"
                 , "[[file:test.png]]"
                 ] =?>
-      para (image "test.png" "fig:" "Attribute after caption")
+      simpleFigure "Attribute after caption"
+                   "test.png" ""
 
   , "Labelled figure" =:
       T.unlines [ "#+caption: My figure"
                 , "#+label: fig:myfig"
                 , "[[file:blub.png]]"
                 ] =?>
-      let attr = ("fig:myfig", mempty, mempty)
-      in para (imageWith attr "blub.png" "fig:" "My figure")
+      figureWith ("fig:myfig", mempty, mempty)
+                 (simpleCaption $ plain "My figure")
+                 (plain (image "blub.png" "" ""))
 
   , "Figure with empty caption" =:
       T.unlines [ "#+caption:"
                 , "[[file:guess.jpg]]"
                 ] =?>
-      para (image "guess.jpg" "fig:" "")
+      figure emptyCaption (plain (image "guess.jpg" "" ""))
   ]
+ where
+  plainCaption = simpleCaption . plain

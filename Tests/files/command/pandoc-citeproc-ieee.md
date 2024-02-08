@@ -48,7 +48,7 @@ References {#references .unnumbered}
 [^3]: Like a citation without author: [-@item1], and now Doe with a
     locator [-@item2 p. 44].
 ^D
-[WARNING] Citeproc: citation nonexistent not found
+2> [WARNING] Citeproc: citation nonexistent not found
 # Pandoc with citeproc-hs
 
 [**nonexistent?**](#ref-nonexistent)
@@ -84,7 +84,7 @@ With some markup *see* [\[1, p. 32\]](#ref-item1).
 
 # References {#references .unnumbered}
 
-::: {#refs .references .csl-bib-body}
+::: {#refs .references .csl-bib-body entry-spacing="0"}
 ::: {#ref-item1 .csl-entry}
 [\[1\] ]{.csl-left-margin}[J. Doe, *First book*. Cambridge: Cambridge
 University Press, 2005.]{.csl-right-inline}

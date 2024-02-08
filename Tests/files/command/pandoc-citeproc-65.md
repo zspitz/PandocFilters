@@ -14,7 +14,7 @@ references:
   id: 'stotz:1996handbuch'
   issued:
     literal: 1996_2004
-  language: German
+  language: de
   number-of-volumes: 5
   publisher: Beck
   publisher-place: Munich
@@ -28,7 +28,7 @@ references:
 ^D
 (Stotz 1996--2004)
 
-::: {#refs .references .csl-bib-body .hanging-indent}
+::: {#refs .references .csl-bib-body .hanging-indent entry-spacing="0"}
 ::: {#ref-stotz:1996handbuch .csl-entry}
 Stotz, Peter. 1996--2004. *Handbuch zur lateinischen Sprache des
 Mittelalters*. 5 vols. Handbuch der Altertumswissenschaft 2.5. Munich:

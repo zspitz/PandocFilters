@@ -1,8 +1,7 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {-# LANGUAGE OverloadedStrings #-}
 {- |
    Module      : Tests.Readers.Org.Shared
-   Copyright   : © 2014-2020 Albert Krewinkel
+   Copyright   : © 2014-2023 Albert Krewinkel
    License     : GNU GPL, version 2 or above
 
    Maintainer  : Albert Krewinkel <albert@zeitkraut.de>
@@ -18,11 +17,11 @@ module Tests.Readers.Org.Shared
   , tagSpan
   ) where
 
-import Prelude
 import Data.List (intersperse)
 import Data.Text (Text)
 import Tests.Helpers (ToString, purely, test)
 import Test.Tasty (TestTree)
+import Test.Tasty.HUnit (HasCallStack)
 import Text.Pandoc (Pandoc, ReaderOptions (readerExtensions),
                     def, getDefaultExtensions, readOrg)
 import Text.Pandoc.Builder (Inlines, smallcaps, space, spanWith, str)
@@ -31,7 +30,7 @@ org :: Text -> Pandoc
 org = purely $ readOrg def{ readerExtensions = getDefaultExtensions "org" }
 
 infix 4 =:
-(=:) :: ToString c
+(=:) :: (ToString c, HasCallStack)
      => String -> (Text, c) -> TestTree
 (=:) = test org
 

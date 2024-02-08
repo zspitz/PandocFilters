@@ -50,7 +50,7 @@
 .als SN SN-NO-DOT
 .als SN-STYLE SN-NO-DOT
 .\" page numbers in footer, centered
-.rm CH
+.ds CH
 .ds CF %
 .\" pdf outline fold level
 .nr PDFOUTLINE.FOLDLEVEL 3
@@ -134,7 +134,7 @@ Here\[cq]s a regular paragraph.
 In Markdown 1.0.0 and earlier.
 Version 8.
 This line turns into a list item.
-Because a hard-wrapped line in the middle of a paragraph looked like a list
+Because a hard\-wrapped line in the middle of a paragraph looked like a list
 item.
 .PP
 Here\[cq]s one with a bullet.
@@ -149,7 +149,7 @@ Block Quotes
 .pdfhref O 1 "Block Quotes"
 .pdfhref M "block-quotes"
 .LP
-E-mail style:
+E\-mail style:
 .QS
 .LP
 This is a block quote.
@@ -197,7 +197,7 @@ Code:
 .IP
 .nf
 \f[C]
----- (should be four hyphens)
+\-\-\-\- (should be four hyphens)
 
 sub status {
     print \[dq]working\[dq];
@@ -436,8 +436,7 @@ Should not be a list item:
 .PP
 M.A.\ 2007
 .PP
-B.
-Williams
+B. Williams
 .HLINE
 .SH 1
 Definition Lists
@@ -606,7 +605,7 @@ Code block:
 .IP
 .nf
 \f[C]
-<!-- Comment -->
+<!\-\- Comment \-\->
 \f[]
 .fi
 .LP
@@ -644,8 +643,8 @@ So is \f[B]\f[BI]this\f[B]\f[R] word.
 .PP
 So is \f[B]\f[BI]this\f[B]\f[R] word.
 .PP
-This is code: \f[C]>\f[R], \f[C]$\f[R], \f[C]\[rs]\f[R], \f[C]\[rs]$\f[R],
-\f[C]<html>\f[R].
+This is code: \f[CR]>\f[R], \f[CR]$\f[R], \f[CR]\[rs]\f[R], \f[CR]\[rs]$\f[R],
+\f[CR]<html>\f[R].
 .PP
 \m[strikecolor]This is \f[I]strikeout\f[R].\m[]
 .PP
@@ -653,8 +652,8 @@ Superscripts: a\*{bc\*}d a\*{\f[I]hello\f[R]\*} a\*{hello\ there\*}.
 .PP
 Subscripts: H\*<2\*>O, H\*<23\*>O, H\*<many\ of\ them\*>O.
 .PP
-These should not be superscripts or subscripts, because of the unescaped
-spaces: a\[ha]b c\[ha]d, a\[ti]b c\[ti]d.
+These should not be superscripts or subscripts, because of the unescaped spaces:
+a\[ha]b c\[ha]d, a\[ti]b c\[ti]d.
 .HLINE
 .SH 1
 Smart quotes, ellipses, dashes
@@ -671,7 +670,7 @@ So is `pine.'
 .PP
 `He said, \[lq]I want to go.\[rq]' Were you alive in the 70\[cq]s?
 .PP
-Here is some quoted `\f[C]code\f[R]' and a \[lq]\c
+Here is some quoted `\f[CR]code\f[R]' and a \[lq]\c
 .pdfhref W -D "http://example.com/?foo=1&bar=2" -A "\c" \
  -- "quoted link"
 \&\[rq].
@@ -696,18 +695,18 @@ LaTeX
 .IP \[bu] 3
 @223@
 .IP \[bu] 3
-@p@-Tree
+@p@\-Tree
 .IP \[bu] 3
 Here\[cq]s some display math:
 .EQ
-d over {d x} f ( x ) = lim sub {h -> 0} {f ( x + h ) \[u2212] f ( x )} over h
+d over {d x} f left ( x right ) = lim from {h -> 0} {f left ( x + h right ) - f left ( x right )} over h
 .EN
 .IP \[bu] 3
 Here\[cq]s one that has a line break in it: @alpha + omega times x sup 2@.
 .LP
 These shouldn\[cq]t be math:
 .IP \[bu] 3
-To get the famous equation, write \f[C]$e = mc\[ha]2$\f[R].
+To get the famous equation, write \f[CR]$e = mc\[ha]2$\f[R].
 .IP \[bu] 3
 $22,000 is a \f[I]lot\f[R] of money.
 So is $34,000.
@@ -715,7 +714,7 @@ So is $34,000.
 .IP \[bu] 3
 Shoes ($20) and socks ($5).
 .IP \[bu] 3
-Escaped \f[C]$\f[R]: $73 \f[I]this should be emphasized\f[R] 23$.
+Escaped \f[CR]$\f[R]: $73 \f[I]this should be emphasized\f[R] 23$.
 .LP
 Here\[cq]s a LaTeX table:
 .HLINE
@@ -766,7 +765,7 @@ Left paren: (
 .PP
 Right paren: )
 .PP
-Greater-than: >
+Greater\-than: >
 .PP
 Hash: #
 .PP
@@ -776,7 +775,7 @@ Bang: !
 .PP
 Plus: +
 .PP
-Minus: -
+Minus: \-
 .HLINE
 .SH 1
 Links
@@ -926,7 +925,7 @@ In a list?
 .IP \[bu] 3
 It should.
 .LP
-An e-mail address: \c
+An e\-mail address: \c
 .pdfhref W -D "mailto:nobody%40nowhere.net" -A "\c" \
  -- "nobody\[at]nowhere.net"
 \&
@@ -938,7 +937,7 @@ Blockquoted: \c
 \&
 .QE
 .LP
-Auto-links should not occur here: \f[C]<http://example.com/>\f[R]
+Auto\-links should not occur here: \f[CR]<http://example.com/>\f[R]
 .IP
 .nf
 \f[C]
@@ -952,10 +951,14 @@ Images
 .pdfhref M "images"
 .LP
 From \[lq]Voyage dans la Lune\[rq] by Georges Melies (1902):
-.PP
-[IMAGE: lalune]
-.PP
-Here is a movie [IMAGE: movie] icon.
+\" .IMAGE "lalune.jpg"
+.ce 1
+lalune
+.sp 1
+.LP
+Here is a movie
+[IMAGE: movie] \" "movie.jpg"
+icon.
 .HLINE
 .SH 1
 Footnotes
@@ -973,8 +976,8 @@ and another.\**
 Here\[cq]s the long note.
 This one contains multiple blocks.
 .PP
-Subsequent blocks are indented to show that they belong to the footnote (as
-with list items).
+Subsequent blocks are indented to show that they belong to the footnote (as with
+list items).
 .IP
 .nf
 \f[C]
@@ -982,8 +985,8 @@ with list items).
 \f[]
 .fi
 .LP
-If you want, you can indent every line, but you can also be lazy and just
-indent the first line of each block.
+If you want, you can indent every line, but you can also be lazy and just indent
+the first line of each block.
 .FE
 This should \f[I]not\f[R] be a footnote reference, because it contains a
 space.[\[ha]my note] Here is an inline note.\**
@@ -992,7 +995,7 @@ This is \f[I]easier\f[R] to type.
 Inline notes may contain \c
 .pdfhref W -D "http://google.com" -A "\c" \
  -- "links"
-\& and \f[C]]\f[R] verbatim characters, as well as [bracketed text].
+\& and \f[CR]]\f[R] verbatim characters, as well as [bracketed text].
 .FE
 .QS
 .LP

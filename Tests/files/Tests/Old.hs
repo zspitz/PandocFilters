@@ -1,7 +1,6 @@
-{-# LANGUAGE NoImplicitPrelude #-}
 {- |
    Module      : Tests.Old
-   Copyright   : © 2006-2020 John MacFarlane
+   Copyright   : © 2006-2023 John MacFarlane
    License     : GNU GPL, version 2 or above
 
    Maintainer  : John MacFarlane <jgm@berkeley@edu>
@@ -12,18 +11,16 @@
 -}
 module Tests.Old (tests) where
 
-import Prelude
 import Data.Algorithm.Diff
-import Data.List (intercalate)
-import Data.Maybe (catMaybes)
 import System.Exit
-import System.FilePath (joinPath, splitDirectories, (<.>), (</>))
-import qualified System.Environment as Env
+import System.FilePath ((<.>), (</>))
+import System.Environment (getExecutablePath)
 import Text.Pandoc.Process (pipeProcess)
 import Test.Tasty (TestTree, testGroup)
 import Test.Tasty.Golden.Advanced (goldenTest)
 import Tests.Helpers hiding (test)
 import qualified Text.Pandoc.UTF8 as UTF8
+import qualified Data.Text as T
 
 tests :: FilePath -> [TestTree]
 tests pandocPath =
@@ -58,7 +55,7 @@ tests pandocPath =
     ]
   , testGroup "latex"
     [ testGroup "writer"
-        (writerTests' "latex" ++ lhsWriterTests' "latex")
+        (extWriterTests' "latex" ++ lhsWriterTests' "latex")
     , testGroup "reader"
       [ test' "basic" ["-r", "latex+raw_tex", "-w", "native", "-s"]
         "latex-reader.latex" "latex-reader.native"
@@ -131,7 +128,10 @@ tests pandocPath =
     , fb2WriterTest' "testsuite" [] "testsuite.native" "writer.fb2"
     ]
   , testGroup "mediawiki"
-    [ testGroup "writer" $ writerTests' "mediawiki"
+    [ testGroup "writer" $ mconcat [
+      writerTests' "mediawiki"
+      , extWriterTests' "mediawiki"
+      ]
     , test' "reader" ["-r", "mediawiki", "-w", "native", "-s"]
       "mediawiki-reader.wiki" "mediawiki-reader.native"
     ]
@@ -149,7 +149,7 @@ tests pandocPath =
       "dokuwiki_external_images.native" "dokuwiki_external_images.dokuwiki"
     ]
   , testGroup "opml"
-    [ test' "basic" ["-r", "native", "-w", "opml", "--columns=78", "-s"]
+    [ test' "basic" ["-r", "native", "-w", "opml", "--columns=80", "-s"]
        "testsuite.native" "writer.opml"
     , test' "reader" ["-r", "opml", "-w", "native", "-s"]
       "opml-reader.opml" "opml-reader.native"
@@ -163,11 +163,11 @@ tests pandocPath =
     [ test' "reader" ["-r", "t2t", "-w", "native", "-s"]
         "txt2tags.t2t" "txt2tags.native" ]
   , testGroup "epub" [
-      test' "features" ["-r", "epub", "-w", "native"]
+      test' "features" ["-r", "epub", "-w", "native", "-s"]
         "epub/features.epub" "epub/features.native"
-    , test' "wasteland" ["-r", "epub", "-w", "native"]
+    , test' "wasteland" ["-r", "epub", "-w", "native", "-s"]
         "epub/wasteland.epub" "epub/wasteland.native"
-    , test' "formatting" ["-r", "epub", "-w", "native"]
+    , test' "formatting" ["-r", "epub", "-w", "native", "-s"]
         "epub/formatting.epub" "epub/formatting.native"
     ]
   , testGroup "twiki"
@@ -178,7 +178,7 @@ tests pandocPath =
         "tikiwiki-reader.tikiwiki" "tikiwiki-reader.native" ]
   , testGroup "other writers" $ map (\f -> testGroup f $ writerTests' f)
     [ "opendocument" , "context" , "texinfo", "icml", "tei"
-    , "man" , "plain" , "rtf", "org", "asciidoc", "asciidoctor"
+    , "man" , "plain" , "asciidoc", "asciidoc_legacy"
     , "xwiki", "zimwiki"
     ]
   , testGroup "writers-lang-and-dir"
@@ -193,15 +193,17 @@ tests pandocPath =
   , testGroup "ms"
     [ testGroup "writer" $ writerTests' "ms"
     ]
+  , testGroup "typst"
+    [ testGroup "writer" $ writerTests' "typst"
+    , testGroup "reader"
+       [ test' "typst-reader" ["-r", "typst", "-w", "native", "-s"]
+          "typst-reader.typ" "typst-reader.native"
+       ]
+    ]
+
   , testGroup "creole"
     [ test' "reader" ["-r", "creole", "-w", "native", "-s"]
       "creole-reader.txt" "creole-reader.native"
-    ]
-  , testGroup "custom writer"
-    [ test' "basic" ["-f", "native", "-t", "../data/sample.lua"]
-      "testsuite.native" "writer.custom"
-    , test' "tables" ["-f", "native", "-t", "../data/sample.lua"]
-      "tables.native" "tables.custom"
     ]
   , testGroup "man"
     [ test' "reader" ["-r", "man", "-w", "native", "-s"]
@@ -210,7 +212,13 @@ tests pandocPath =
   , testGroup "org"
     [ test' "reader" ["-r", "org", "-w", "native", "-s"]
       "org-select-tags.org" "org-select-tags.native"
+    , testGroup "writer" $ writerTests' "org"
     ]
+  , testGroup "rtf"
+    [ testGroup "writer" $ writerTests' "rtf" ]
+  , testGroup "endnotexml"
+    [ test' "reader" ["-r", "endnotexml", "-w", "native", "-s"]
+        "endnotexml-reader.xml" "endnotexml-reader.native" ]
   , testGroup "ipynb"
     [ test' "reader" ["-f", "ipynb-raw_html-raw_tex+raw_attribute",
                       "-t", "native", "-s"]
@@ -219,7 +227,16 @@ tests pandocPath =
                       "--markdown-headings=setext", "-t",
                       "ipynb-raw_html-raw_tex+raw_attribute", "-s"]
       "ipynb/simple.in.native" "ipynb/simple.ipynb"
+    , test' "reader" ["-t", "native", "-f", "ipynb",
+                      "--ipynb-output=all"]
+      "ipynb/mime.ipynb" "ipynb/mime.native"
+    , test' "writer" ["-f", "native", "-t", "ipynb",
+                      "--wrap=preserve"]
+      "ipynb/mime.native" "ipynb/mime.out.ipynb"
+    , test' "reader" ["-f", "ipynb", "-t", "html"]
+      "ipynb/rank.ipynb" "ipynb/rank.out.html"
     ]
+  , testGroup "markua" [ testGroup "writer" $ writerTests' "markua"]
   ]
  where
     test'           = test pandocPath
@@ -233,7 +250,7 @@ tests pandocPath =
 -- makes sure file is fully closed after reading
 readFile' :: FilePath -> IO String
 readFile' f = do s <- UTF8.readFile f
-                 return $! (length s `seq` s)
+                 return $! (T.length s `seq` T.unpack s)
 
 lhsWriterTests :: FilePath -> String -> [TestTree]
 lhsWriterTests pandocPath format
@@ -262,7 +279,7 @@ writerTests pandocPath format
        "tables" opts             "tables.native"    ("tables" <.> format)
     ]
   where
-    opts = ["-r", "native", "-w", format, "--columns=78",
+    opts = ["-r", "native", "-w", format, "--columns=80",
             "--variable", "pandoc-version="]
 
 extendedWriterTests :: FilePath -> String -> [TestTree]
@@ -276,7 +293,7 @@ extendedWriterTests pandocPath format
                ("tables" </> name <.> format)
     in map testForTable ["planets", "nordics", "students"]
   where
-    opts = ["-r", "native", "-w", format, "--columns=78",
+    opts = ["-r", "native", "-w", format, "--columns=80",
             "--variable", "pandoc-version="]
 
 s5WriterTest :: FilePath -> String -> [String] -> String -> TestTree
@@ -320,27 +337,21 @@ testWithNormalize normalizer pandocPath testname opts inp norm =
     (compareValues norm options) updateGolden
   where getExpected = normalizer <$> readFile' norm
         getActual   = do
-              mldpath   <- Env.lookupEnv "LD_LIBRARY_PATH"
-              mdyldpath <- Env.lookupEnv "DYLD_LIBRARY_PATH"
-              let mbDynlibDir = findDynlibDir (reverse $
-                                 splitDirectories pandocPath)
-              let dynlibEnv = [("DYLD_LIBRARY_PATH", intercalate ":" $ catMaybes [mbDynlibDir, mdyldpath])
-                              ,("LD_LIBRARY_PATH",   intercalate ":" $ catMaybes [mbDynlibDir, mldpath])]
-              let env = dynlibEnv ++
-                        [("TMP","."),("LANG","en_US.UTF-8"),("HOME", "./")]
-              (ec, out) <- pipeProcess (Just env) pandocPath options mempty
+              env <- setupEnvironment pandocPath
+              (ec, out) <- pipeProcess (Just env) pandocPath
+                             ("--emulate":options) mempty
               if ec == ExitSuccess
                  then return $ filter (/='\r') . normalizer
                              $ UTF8.toStringLazy out
                    -- filter \r so the tests will work on Windows machines
                  else fail $ "Pandoc failed with error code " ++ show ec
-        updateGolden = UTF8.writeFile norm
-        options = ["--data-dir=../data","--quiet"] ++ [inp] ++ opts
+        updateGolden = UTF8.writeFile norm . T.pack
+        options = ["--quiet"] ++ [inp] ++ opts
 
 compareValues :: FilePath -> [String] -> String -> String -> IO (Maybe String)
 compareValues norm options expected actual = do
-  pandocPath <- findPandoc
-  let cmd  = pandocPath ++ " " ++ unwords options
+  testExePath <- getExecutablePath
+  let cmd  = testExePath ++ " --emulate " ++ unwords options
   let dash = replicate 72 '-'
   let diff = getDiff (lines actual) (lines expected)
   if expected == actual
@@ -350,8 +361,3 @@ compareValues norm options expected actual = do
         "\n--- " ++ norm ++
         "\n+++ " ++ cmd ++ "\n" ++
         showDiff (1,1) diff ++ dash
-
-findDynlibDir :: [FilePath] -> Maybe FilePath
-findDynlibDir []           = Nothing
-findDynlibDir ("build":xs) = Just $ joinPath (reverse xs) </> "build"
-findDynlibDir (_:xs)       = findDynlibDir xs

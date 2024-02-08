@@ -20,6 +20,7 @@ namespace PandocFilters.Ast {
         private Func<Header, Header>? headerDelegate;
         private Func<HorizontalRule, HorizontalRule>? horizontalRuleDelegate;
         private Func<Table, Table>? tableDelegate;
+        private Func<Figure, Figure>? figureDelegate;
         private Func<Div, Div>? divDelegate;
         private Func<Inline, Inline>? inlineDelegate;
         private Func<Str, Str>? strDelegate;
@@ -71,6 +72,7 @@ namespace PandocFilters.Ast {
         public void Add(Func<Header, Header> del) => AddDelegate(ref headerDelegate, del);
         public void Add(Func<HorizontalRule, HorizontalRule> del) => AddDelegate(ref horizontalRuleDelegate, del);
         public void Add(Func<Table, Table> del) => AddDelegate(ref tableDelegate, del);
+        public void Add(Func<Figure, Figure> del) => AddDelegate(ref figureDelegate, del);
         public void Add(Func<Div, Div> del) => AddDelegate(ref divDelegate, del);
         public void Add(Func<Inline, Inline> del) => AddDelegate(ref inlineDelegate, del);
         public void Add(Func<Str, Str> del) => AddDelegate(ref strDelegate, del);

@@ -47,21 +47,21 @@ References {#references .unnumbered}
 [^3]: Like a citation without author: [-@item1], and now Doe with a
     locator [-@item2 p. 44].
 ^D
-[WARNING] Citeproc: citation nonexistent not found
+2> [WARNING] Citeproc: citation nonexistent not found
 # Pandoc with citeproc-hs
 
 ([**nonexistent?**](#ref-nonexistent))
 
 ([**nonexistent?**](#ref-nonexistent))
 
-[Doe](#ref-item1) ([2005](#ref-item1)) says blah.
+Doe ([2005](#ref-item1)) says blah.
 
-[Doe](#ref-item1) ([2005, 30](#ref-item1)) says blah.
+Doe ([2005, 30](#ref-item1)) says blah.
 
-[Doe](#ref-item1) ([2005, 30](#ref-item1), with suffix) says blah.
+Doe ([2005, 30](#ref-item1), with suffix) says blah.
 
-[Doe](#ref-item1) ([2005](#ref-item1), [2006, 30](#ref-item2); see also
-[Doe and Roe 2007](#ref-пункт3)) says blah.
+Doe ([2005](#ref-item1); [2006, 30](#ref-item2); see also [Doe and Roe
+2007](#ref-пункт3)) says blah.
 
 In a note.[^1]
 
@@ -83,7 +83,7 @@ With some markup (*see* [Doe 2005, 32](#ref-item1)).
 
 # References {#references .unnumbered}
 
-::: {#refs .references .csl-bib-body .hanging-indent}
+::: {#refs .references .csl-bib-body .hanging-indent entry-spacing="0"}
 ::: {#ref-item1 .csl-entry}
 Doe, John. 2005. *First Book*. Cambridge: Cambridge University Press.
 :::
@@ -98,8 +98,8 @@ edited by Sam Smith. Oxford: Oxford University Press.
 :::
 :::
 
-[^1]: [Doe and Roe](#ref-пункт3) ([2007, 12](#ref-пункт3)) and a
-    citation without locators ([Doe and Roe 2007](#ref-пункт3)).
+[^1]: Doe and Roe ([2007, 12](#ref-пункт3)) and a citation without
+    locators ([Doe and Roe 2007](#ref-пункт3)).
 
 [^2]: Some citations (see [Doe 2005, chap. 3](#ref-item1);
     [2006](#ref-item2); [Doe and Roe 2007](#ref-пункт3)).

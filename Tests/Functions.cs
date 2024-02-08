@@ -8,7 +8,7 @@ using static ZSpitz.Util.Functions;
 
 namespace Tests {
     public static class Functions {
-        const string pandocPath = @"C:\Program Files\Pandoc\pandoc.exe";
+        const string pandocPath = @"pandoc.exe";
 
         private static Process getProcess(string docPath, string filter = "", string outputFormat = "native", string inputFormat = "") {
             if (docPath.IsNullOrWhitespace()) { throw new InvalidOperationException("Missing document path."); }
